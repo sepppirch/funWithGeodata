@@ -1,4 +1,4 @@
-import downloadSatImage
+#import downloadSatImage
 import overpassQuery
 import segmentSatImage
 import hightmapTiles
@@ -18,13 +18,15 @@ def createATile (bigtile):
 
     except OSError as error:
         print("directory exists")
+
+    overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-smoothed.geojson','roadssmooth')
     '''
     overpassQuery.cropGeoJsonPoly(bigtile,'runways.geojson','runway')
     overpassQuery.cropGeoJsonPoly(bigtile,'aerialways.geojson','aerialways')
     '''
-    downloadSatImage.downloadSat(bigtile,12)
+    #downloadSatImage.downloadSat(bigtile,12)
     #makeBuildingGeometry.makeBuildings(name)
-
+    
     '''
     #segmentSatImage.segment(name)
     overpassQuery.downloadGeoJson(bigtile,'way["building"]',"LineString", 'buildings')
@@ -61,12 +63,12 @@ def createATile (bigtile):
 #   '''
     
      
-    hightmapTiles.makeHightMap(bigtile)
+    #hightmapTiles.makeHightMap(bigtile)
          
     #hightmapTiles.hightmapBurnIn(bigtile)
     #makeLakes.makeRiverMesh(name)
     #makeLakes.makeRoadMesh(name)
     #downloadSatImage.makeNormalmap(bigtile, 256)
-#createATile((-1,-50))
+createATile((5,-5))
 
 #hightmapTiles.makeHightMap((52,-49))

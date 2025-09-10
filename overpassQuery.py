@@ -92,6 +92,7 @@ def cropGeoJsonPoly(bigtile, infilename, outfilename):
 #downloadGeoJson((0,0),'relation["type"="multipolygon"]',"LineString", 'forestX')
 
 
+
 #downloadGeoJson((0,0),'way[aerialway=cable_car]',"LineString", 'test')
 #downloadGeoJson((6,-29),'way[power=line]',"LineString", 'power')
 #downloadGeoJson((5,-8),'node[natural=peak]',"Point", 'peaks')

@@ -49,7 +49,7 @@ name = "0_0"
 
 
 def makeLakes(name):
-    size = 204200
+    size = 204000
     verts = []
     UVs = []
     tris = []
@@ -84,7 +84,7 @@ def makeLakes(name):
                     ymin = p[1]
             w = xmax - xmin
             h = ymax - ymin
-            z = hmap[int(p1[1]*2041)][int(p1[0]*2041)]*1.5625 - 51200
+            z = hmap[int(p1[1]*2040)][int(p1[0]*2040)]*1.5625 - 51200
         # p1 --- p2
         # p3 --- p4
             p1 =[xmin*size, ymax*size, z]
@@ -118,7 +118,7 @@ def makeLakes(name):
 
 
 def makeLakesMesh(name):
-    size = 204200
+    size = 204000
     verts = []
     tris = []
 
@@ -147,7 +147,7 @@ def makeLakesMesh(name):
                 newcountur.append([p[0]*size,p[1]*size])
                 #print(p)
 
-            z = hmap[int(p1[1]*2041)][int(p1[0]*2041)]*1.5625 - 51200
+            z = hmap[int(p1[1]*2040)][int(p1[0]*2040)]*1.5625 - 51200
             altis.append(z)
             print(z)
             contours.append(newcountur)
@@ -215,7 +215,7 @@ def makeLakesMesh(name):
 
 def makeRiverMesh(name):
 
-    size = 204200
+    size = 204000
     verts = []
     UVs = []
     tris = []
@@ -399,18 +399,18 @@ def makeRiverMesh(name):
 
 
 def makeRoadMesh(name):
-    size = 204200
+    size = 204000
     verts = []
     UVs = []
     tris3Lane = []
     tris2Lane = []
     tris1Lane = []
     lanes = 0
-    rwidth = 0.00015
+    rwidth = 0.00025
     hmap = cv2.imread(name +'/hmap_burnIn_noRiver'+name+'.png', cv2.IMREAD_UNCHANGED)
     InstancedMeshBridges = {}
     InstancedMeshBridges["features"] = []
-    f = open(name+'/roads_'+name+'.json')
+    f = open(name+'/roadssmooth_'+name+'.json')
     rawdata = json.load(f)
     data = findConnectedRoads.combineMultiSegment(rawdata)
     #data = findConnectedRoads.findJunctions(rdata)
@@ -424,6 +424,7 @@ def makeRoadMesh(name):
 
         # first, cut segments at tile borders
         for sample in data["features"]:
+            '''
             if sample["properties"]["highway"] in selectedRoads:
                  
                 if sample["properties"]["highway"] == "motorway":
@@ -446,6 +447,31 @@ def makeRoadMesh(name):
                 if "bridge" in sample["properties"]:
                     thisSegment["bridge"] = 1
                 if "tunnel" in sample["properties"]: # or "bridge" in sample["properties"]
+                    thisSegment["tunnel"] = 1
+                    thisSegment["bridge"] = 1
+            '''
+            if sample["properties"]["fclass"] in selectedRoads:
+                 
+                if sample["properties"]["fclass"] == "motorway":
+                    lanes = 3
+                elif sample["properties"]["fclass"] == "motorway_link":
+                    lanes = 1
+                else:
+                    lanes = 2
+
+                thisSegment = {}
+                thisSegment["geometry"] = {}
+                thisSegment["geometry"]["coordinates"] = []
+                thisSegment["lanes"] = lanes
+                thisSegment["bridge"] = 0
+                thisSegment["tunnel"] = 0
+                thisSegment["highway"] = sample["properties"]["fclass"]
+
+
+                    #print(int(sample["properties"]["lanes"]))
+                if  sample["properties"]["bridge"] == "T":
+                    thisSegment["bridge"] = 1
+                if  sample["properties"][ "tunnel"]  == "T": # or "bridge" in sample["properties"]
                     thisSegment["tunnel"] = 1
                     thisSegment["bridge"] = 1
 
@@ -645,7 +671,7 @@ def makeRoadMesh(name):
             json.dump(InstancedMeshBridges,f)
 
         open(name +'/roads_'+name+'.obj', 'w').close()
-        with open(name +'/roads_'+name+'.obj', 'a') as f1:
+        with open(name +'/roads_'+name+'.obj', 'w') as f1:
             for v in verts:
                 line = "v " + str(v[0]) + " " + str(v[1]) + " " + str(v[2]) + '\n'
                 f1.write(line)
@@ -798,4 +824,4 @@ def cropGeoJsonLineFeature(name):
 
 #cropGeoJsonLineFeature(name)
 #makeRiverMesh("14_-15")
-#makeRoadMesh("0_0")
+#makeRoadMesh("0_-2")

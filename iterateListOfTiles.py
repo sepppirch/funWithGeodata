@@ -15,6 +15,7 @@ import masks
 #import segmentSatImage
 import numpy as np
 import thermalcalculator
+import overpassQuery
 names = []
 newnames = []
 jsonfiles = [""]
@@ -38,7 +39,7 @@ def copyfiles(src_path, destination_path):
 
 
 # 'F.geojson'
-with open('F.geojson', 'r') as file:
+with open('F_quarter.geojson', 'r') as file:
     data = json.load(file)
     for f in data["features"]:
         n = f["properties"]["name"].split("|")
@@ -55,9 +56,12 @@ for n in names:
     #print("{"+ str(add[0])+","+str(add[1])+"},")
     #segmentSatImage.segment(n)
     print(n)
+    #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-smoothed_1.geojson','roadssmooth')
     #landuse.makeMasksfromLanduse(bigtile)
-    src_path = n +'/'+"thermGen_"+n+'.json'
-    destination_path = wpath+'/tg_'+newnames[c]+'.json'
+    src_path = n +'/'+"roads_"+n+'.obj'
+    destination_path = 'worldmachine_json/newroads/rw_'+newnames[c]+'.obj'
+
+    makeLakes.makeRoadMesh(n)
     copyfiles(src_path,destination_path)
     #thermalcalculator.searchCountures(bigtile)
 
@@ -129,7 +133,7 @@ for n in names:
     #overpassQuery.cropGeoJsonPoly(bigtile,'geojson_src/thermals.geojson','thermals')
     #makeLakes.makeLakes(n)
     #makeBuildingGeometry.filterBuildings(n)
-    #makeBuildingGeometry.makeBuildings(n)
+    #
     #copyfiles(n,newnames[c],"worldmachine_json")
 
     

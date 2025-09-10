@@ -10,12 +10,13 @@ import makeLandscapeMesh
 import normalfromhightmap
 import cv2
 sector = "F"
-wpath = "worldmachine_" + sector + "/2041/"
+wpath = "worldmachine_" + sector + "/1017/"
 #wpath = "worldmachine_json"
 
 
 def copyWind(name, newname,dir):
-    newpath = r'worldmachine_json/'+dir+'wind/'+dir+'wind__' +newname
+    #newpath = r'worldmachine_json/'+dir+'wind/'+dir+'wind__' +newname
+    newpath = r'worldmachine_F/'+dir+'wind/'+dir+'wind__' +newname
     #if not os.path.exists(newpath):
         #os.makedirs(newpath)
 
@@ -29,12 +30,14 @@ def copyWind(name, newname,dir):
 def copyfilesForSectors(name, newname, wpath):
     #folders = ["aerialways","bridges","PowerReady","lakes","peaks","talwind"]
     #prefix = ["aerialway_","bridge_","cables_","lakes_","peaks_","talwind_"]
-    #folders = ["rivers","roads, building"]
+    #folders = ["rivers_","roads_", "building_"]
     #prefix = ["river_","rw_","b_"]
-    folders = ["forest","grass","ice","asphalt"]
-    prefix = ["f_","g_","i_","a_"]
+    folders = ["forest","grass","ice","asphalt","hmap_burnIn_"]
+    prefix = ["f_","g_","i_","a_","h_"]
     #folders = ["hmaps"]
     #prefix = ["h_"]
+    #folders = ["nmap_small_"]
+    #prefix = ["n_"]
     for i in range (len(folders)):
         wmname = newname.split("_")
         wmname = "X"+str(int(wmname[0].replace("X",""))%18) + "_Y"+ str(int(wmname[1].replace("Y",""))%18)
@@ -43,26 +46,30 @@ def copyfilesForSectors(name, newname, wpath):
         #if i ==2:
         #src_path = name +'/hmap_burnIn_quarter_'+name+'.png'
         destination_path = wpath+'/'+ folders[i]+'/'+prefix[i]+wmname+'.png'
-        copy(src_path, destination_path)
-        '''
+        print(src_path)
+        print(destination_path)
+        #copy(src_path, destination_path)
+        
         if os.path.isfile(src_path):
             img = cv2.imread(src_path, cv2.IMREAD_UNCHANGED)
-            img = cv2.resize(img, (505,505), interpolation= cv2.INTER_LINEAR)
+            img = cv2.resize(img, (1017,1017), interpolation= cv2.INTER_LINEAR)
             cv2.imwrite(destination_path, img)
             
         else:
             print("couldnt find "+ src_path)
-        '''
+        
 def copyfiles(name, newname, wpath):
     #folders = ["aerialways","bridges","PowerReady","lakes","peaks","talwind"]
     #prefix = ["aerialway_","bridge_","cables_","lakes_","peaks_","talwind_"]
-    #folders = ["rivers","roads, building"]
+    #folders = ["rivers_","roads_", "building_"]
     #prefix = ["river_","rw_","b_"]
-    folders = ["nmap_small_"]
-    prefix = ["n_"]
+    #folders = ["nmap_small_"]
+    #prefix = ["n_"]
+    folders = ["lakes_"]
+    prefix = ["lakes_"]
     for i in range (len(folders)):
-        src_path = name +'/'+folders[i]+name+'.png'
-        destination_path = wpath+'/'+ folders[i]+'/'+prefix[i]+newname+'.png'
+        src_path = name +'/'+folders[i]+name+'.obj'
+        destination_path = wpath+'/'+ folders[i]+'/'+prefix[i]+newname+'.obj'
         if os.path.isfile(src_path):
             copy(src_path, destination_path)
         else:
@@ -73,7 +80,7 @@ newnames = []
 jsonfiles = [""]
 ### iterate all tiles in tileselection 
 #
-with open(str(sector)+'.geojson', 'r') as file:
+with open(str(sector)+'_quarter.geojson', 'r') as file:
 #with open('tileselection.geojson', 'r') as file:
     data = json.load(file)
     for f in data["features"]:
@@ -92,7 +99,7 @@ for n in names:
     #print("{"+ str(add[0])+","+str(add[1])+"},")
     copyfilesForSectors(n, newnames[c], wpath)
     #copyWind(n,newnames[c],"w")
-
+    #copyfiles(n, newnames[c], wpath)
     c += 1
     '''
 ### create items if they dont exist

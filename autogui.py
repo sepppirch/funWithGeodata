@@ -67,7 +67,7 @@ for x in range(36):
 
 names = []
 
-with open('F.geojson', 'r') as file:
+with open('F_quarter.geojson', 'r') as file:
     data = json.load(file)
     for f in data["features"]:
         n = f["properties"]["name"].split("|")

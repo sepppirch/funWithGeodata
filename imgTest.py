@@ -22,7 +22,7 @@ blank_image = np.ones((height,width,3), np.uint8)
 blank_image[0:512,0:512] = (255,255,255)      # (B, G, R)
 #blank_image[:,width//2:width] = (0,255,0)
 # reading the image
-image = cv2.imread('test.bmp')
+image = cv2.imread('grid.png')
 replicate = cv2.copyMakeBorder(src=image, top=106, bottom=106, left=106, right=106, borderType=cv2.BORDER_REPLICATE)
 rotated = rotate(replicate,rot)
 replicate = rotated
