@@ -7,6 +7,8 @@ def iterateLevels(name):
     x = int(n[0].replace("X",""))%18
     y = int(n[1].replace("Y",""))%18
     newname = "X"+str(x)+"_"+"Y"+str(y)
+
+
     pyautogui.click(300, 200)
     for i in range(10):
         pyautogui.keyDown('backspace')
@@ -16,7 +18,7 @@ def iterateLevels(name):
     time.sleep(3)
     pyautogui.click(1400, 940)
     time.sleep(1)
-    pyautogui.click(2000, 555)
+    pyautogui.click(2000, 500)
     time.sleep(1)
     pyautogui.hotkey('ctrl', 'v')
     time.sleep(1)
@@ -62,17 +64,93 @@ for x in range(36):
 '''
 
 
-
 #iterateLevels("X10_Y11")
 
-names = []
 
-with open('F_quarter.geojson', 'r') as file:
-    data = json.load(file)
-    for f in data["features"]:
-        n = f["properties"]["name"].split("|")
-        names.append(n[1][1:])
-#print(names)
-for n in names:
-    iterateLevels(n)
-   
+def findbuttons():
+
+
+
+    
+    valid = False
+    buildbutton = []
+    searbuttne = []
+    try:
+        buildbutton = pyautogui.locateOnScreen('bmbutton.png', confidence=0.9)
+        print(buildbutton)
+        
+        searbuttne = pyautogui.locateOnScreen('searchimage.png', confidence=0.9)
+        print(searbuttne)
+
+        savebuttne = pyautogui.locateOnScreen('savebutton.png', confidence=0.9)
+        print(searbuttne)
+
+
+
+        valid = True
+
+
+
+
+    except:
+        print("errror")
+
+    names = []
+
+    with open('F_quarter.geojson', 'r') as file:
+        data = json.load(file)
+        for f in data["features"]:
+            n = f["properties"]["name"].split("|")
+            names.append(n[1][1:])
+    #print(names)
+
+    if valid:
+
+        for name in names:
+            n=name.split("_")
+            x = int(n[0].replace("X",""))%18
+            y = int(n[1].replace("Y",""))%18
+            newname = "X"+str(x)+"_"+"Y"+str(y)
+        
+            buildbuttonXY = [buildbutton.left + buildbutton.width/2, buildbutton.top + buildbutton.height/2]
+            searchXY = [searbuttne.left + searbuttne.width+ 200,searbuttne.top + searbuttne.height/2]
+            pathfield = [buildbuttonXY[0] + 300, buildbuttonXY[1] + 43]
+            level = [searbuttne.left + 20, searbuttne.top + 70]
+            saveXY = [savebuttne.left + savebuttne.width/2, savebuttne.top + savebuttne.height/2]
+            
+            
+            pyautogui.moveTo(searchXY, duration = 0.2)
+            pyautogui.click()
+            for i in range(10):
+                pyautogui.keyDown('backspace')
+            pyautogui.write(newname)
+            pyautogui.moveTo(level, duration = 0.2)
+            pyautogui.doubleClick()
+            pyautogui.moveTo([1400,930], duration = 0.2)
+            time.sleep(0.5)
+            pyautogui.click() #SAVE
+            time.sleep(1.5)
+            pyautogui.click()
+            pyautogui.hotkey('ctrl', 'v')
+            
+            pyautogui.moveTo(pathfield, duration = 0.2)
+            pyautogui.click()
+            for i in range(10):
+                pyautogui.keyDown('backspace')
+                pyautogui.keyDown('delete')
+            pyautogui.write(name)
+            pyautogui.moveTo(saveXY, duration = 0.2)
+            pyautogui.click()
+            time.sleep(1)
+            pyautogui.moveTo(buildbuttonXY, duration = 0.2)
+            pyautogui.click()
+            time.sleep(1.5)
+
+
+
+
+
+findbuttons()
+
+
+#findbuttons("X10_Y11")

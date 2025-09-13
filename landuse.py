@@ -102,7 +102,7 @@ def makeMasksfromLanduse(bigtile):
 
         
 
-        roadsmask = Image.open(name+"/rmask"+name+".png")
+        roadsmask = Image.open(name+"/roadsmask"+name+".png")
         rmb = roadsmask.filter(ImageFilter.BoxBlur(0.5))
         roadsmask = rmb.point( lambda p: 255 if p > 15 else 0 )
         

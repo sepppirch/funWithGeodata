@@ -10,7 +10,7 @@ import makeLandscapeMesh
 import normalfromhightmap
 import cv2
 sector = "F"
-wpath = "worldmachine_" + sector + "/1017/"
+wpath = "worldmachine_" + sector + "/2041/"
 #wpath = "worldmachine_json"
 
 
@@ -32,24 +32,27 @@ def copyfilesForSectors(name, newname, wpath):
     #prefix = ["aerialway_","bridge_","cables_","lakes_","peaks_","talwind_"]
     #folders = ["rivers_","roads_", "building_"]
     #prefix = ["river_","rw_","b_"]
-    folders = ["forest","grass","ice","asphalt","hmap_burnIn_"]
-    prefix = ["f_","g_","i_","a_","h_"]
-    #folders = ["hmaps"]
+    #folders = ["forest","grass","ice","asphalt","hmap_burnIn_"]
+    #prefix = ["f_","g_","i_","a_","h_"]
+    #folders = ["hmap_burnIn_"]
     #prefix = ["h_"]
+    folders = ["roads_"]
+    prefix = ["rw_"]
+    suffix = ".obj"
     #folders = ["nmap_small_"]
     #prefix = ["n_"]
     for i in range (len(folders)):
         wmname = newname.split("_")
         wmname = "X"+str(int(wmname[0].replace("X",""))%18) + "_Y"+ str(int(wmname[1].replace("Y",""))%18)
          
-        src_path = name +'/'+folders[i]+name+'.png'
+        src_path = name +"/"+folders[i]+name+suffix
         #if i ==2:
         #src_path = name +'/hmap_burnIn_quarter_'+name+'.png'
-        destination_path = wpath+'/'+ folders[i]+'/'+prefix[i]+wmname+'.png'
+        destination_path = wpath+ folders[i]+'/'+prefix[i]+wmname+suffix
         print(src_path)
         print(destination_path)
-        #copy(src_path, destination_path)
-        
+        copy(src_path, destination_path)
+        '''
         if os.path.isfile(src_path):
             img = cv2.imread(src_path, cv2.IMREAD_UNCHANGED)
             img = cv2.resize(img, (1017,1017), interpolation= cv2.INTER_LINEAR)
@@ -57,7 +60,7 @@ def copyfilesForSectors(name, newname, wpath):
             
         else:
             print("couldnt find "+ src_path)
-        
+        '''
 def copyfiles(name, newname, wpath):
     #folders = ["aerialways","bridges","PowerReady","lakes","peaks","talwind"]
     #prefix = ["aerialway_","bridge_","cables_","lakes_","peaks_","talwind_"]

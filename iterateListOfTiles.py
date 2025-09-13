@@ -16,6 +16,9 @@ import masks
 import numpy as np
 import thermalcalculator
 import overpassQuery
+import hightmapTiles
+
+
 names = []
 newnames = []
 jsonfiles = [""]
@@ -52,16 +55,27 @@ c = 0
 for n in names:
     add = n.split("_")
     bigtile = (int(add[0]),int(add[1]))
+    '''
+    try:
+        #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-smoothed_1.geojson','roadssmooth')
+        
+        makeLakes.makeRoadMesh(bigtile)
+    except:
+        print("error")
+    '''
+    #hightmapTiles.hightmapBurnIn(bigtile)
+    #postprocessHmap.closegaps(bigtile)
     #postprocessHmap.closegaps((int(add[0]),int(add[1])))
     #print("{"+ str(add[0])+","+str(add[1])+"},")
     #segmentSatImage.segment(n)
     print(n)
-    #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-smoothed_1.geojson','roadssmooth')
+    #
     #landuse.makeMasksfromLanduse(bigtile)
+    
     src_path = n +'/'+"roads_"+n+'.obj'
     destination_path = 'worldmachine_json/newroads/rw_'+newnames[c]+'.obj'
 
-    makeLakes.makeRoadMesh(n)
+    #makeLakes.makeRoadMesh(n)
     copyfiles(src_path,destination_path)
     #thermalcalculator.searchCountures(bigtile)
 

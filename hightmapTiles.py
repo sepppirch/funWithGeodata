@@ -162,7 +162,7 @@ def makeHightMap(bigtile):
     if os.path.exists(name +'/hmapTymask.png'):
         os.remove(name +'/hmapTymask.png')
  
-#makeHightMap((-1,-2))
+
 
 
 
@@ -252,26 +252,7 @@ def hightmapBurnIn(bigtile):
     newim.save(name +'/lake'+name+'.png')
     newim.close()
 
-    array = []
-    
-    tiff_file = "alps_rivers.tif"
-    #tiff_file = "DEM/rivers_eFrance.tif"
-    geo_tiff = GeoTiff(tiff_file, crs_code=4258, as_crs=4258)#4258
-    area_box = [(topLeft[0],topLeft[1]), (topLeft[0]+w,topLeft[1]-h)]
-    array = geo_tiff.read_box(area_box)
-    
-    rivers = Image.fromarray(np.uint8(array), "RGBA").convert('L') # or more verbose as Image.fromarray(ar32, 'I')
 
-    rivers = rivers.resize(newsize, Image.Resampling.BICUBIC)
-
-    newimdata = []
-
-    for color in rivers.getdata():
-        newimdata.append(color*256)
-    newim = Image.new('I',hmap.size)
-    newim.putdata(newimdata)
-    newim.save(name +'/rivers'+name+'.png')
-    newim.close()
 
 
 
@@ -293,65 +274,24 @@ def hightmapBurnIn(bigtile):
     # Displaying the image  
 
 
-    for x in range(2041):
-        for y in range(2041):
-            if (alt[x][y] - lakeb[x][y]/100 - lakeb1[x][y]/100) > 0:
-                alt[x][y] = alt[x][y] - lakeb[x][y]/100 - lakeb1[x][y]/100 #- rivers[x][y]/100
-            else:
-                alt[x][y] = 0
+    altn = np.copy(alt)
+    altm = np.copy(alt)
+    
+    ksize = (5,5)
+
+    altb = cv2.blur(altn, ksize) 
 
 
     #cv2.imwrite(name+'/overlayed'+name+'.png', alt)
 
     print("burn in lakes and rivers")
 
-    altn = np.copy(alt)
-    # R O A D S
-
-
-    f = open(name+'/roads_'+name+'.json')
-    data = json.load(f)
-
-    for i in data["features"]:
-        if not "tunnel" in i["properties"].keys() and not "bridge" in i["properties"].keys():
-        #if i["properties"]["tunnel"] != "yes" and i["properties"]["bridge"] != "yes":
-            for j in range(len(i["geometry"]["coordinates"])-1): #["properties"]
-
-                thisP = np.array([i["geometry"]["coordinates"][j][0]  *2041, i["geometry"]["coordinates"][j][1]*2041])
-                nextP = np.array([i["geometry"]["coordinates"][j+1][0]  *2041, i["geometry"]["coordinates"][j+1][1]*2041])
-                l = np.linalg.norm(thisP - nextP)
-                #print(l)
-                step = np.subtract(nextP,thisP)/l/2
-
-
-                if thisP[0] < 2041 and thisP[0] > 0 and thisP[1] < 2041 and thisP[1] > 0 :
-                    if nextP[0] < 2041 and nextP[0] > 0 and nextP[1] < 2041 and nextP[1] > 0 :
-                        cbase =  alt[int(thisP[1])][int(thisP[0])]
-                        cstep = (int(alt[int(nextP[1])][int(nextP[0])]) - int(alt[int(thisP[1])][int(thisP[0])]) ) /l/2
-                
-                        for point in range(int(l)*2+1):
-
-                            newPoint = thisP + step * point
-
-                            if newPoint[0] < 2041 and newPoint[0] > 0 and newPoint[1] < 2041 and newPoint[1] > 0 :
-                                c = alt[int(newPoint[1])][int(newPoint[0])]
-                    # neighboring pixels        
-                                for u in range(3):
-                                    for v in range(3):
-                                        px = newPoint[0] + u - 1
-                                        py = newPoint[1] + v - 1
-                                        #print(str(x) +  "   "+str(y))
-                                        if px < 2041 and px > 0 and py < 2041 and py > 0 :
-                                                    
-                                            altn[int(py)][int(px)] = cbase + cstep * point
-                                            #roadsMask[int(py)][int(px)] = 255
-
-                                            roadsMask[int(py)][int(px)] = 255            
-
-    cv2.imwrite(name+'/hmap_burnIn_noRiver'+name+'.png', altn)
-
-
-
+    for x in range(2041):
+        for y in range(2041):
+            if (alt[x][y] - lakeb[x][y]/100 - lakeb1[x][y]/100) > 0:
+                altn[x][y] = altn[x][y] - lakeb[x][y]/200 - lakeb1[x][y]/200 #- rivers[x][y]/100
+            else:
+                altn[x][y] = 0
 
     # RIVERS
                                 
@@ -565,10 +505,115 @@ def hightmapBurnIn(bigtile):
                                             roadsMask[int(py)][int(px)] = 255
 
 
+    # R O A D S
+
+
+    f = open(name+'/roads_'+name+'.json')
+    data = json.load(f)
+    lanes = 1
+    Roads3l = ["motorway_link","trunk","primary"]
+    Roads2l = ["secondary","unclassified","tertiary","service"]
+    for i in data["features"]:
+        if not "tunnel" in i["properties"].keys() and not "bridge" in i["properties"].keys():
+
+            if i["properties"]["highway"] == "motorway":
+                lanes = 4
+                #print("highway")
+                #print(i["properties"]["highway"])
+            elif i["properties"]["highway"] in Roads3l:
+                lanes = 3
+            elif i["properties"]["highway"] in Roads2l:
+                lanes = 2
+            else:
+                lanes = 1
+        #if i["properties"]["tunnel"] != "T" and i["properties"]["bridge"] != "T":
+            for j in range(len(i["geometry"]["coordinates"])-1): #["properties"]
+
+                thisP = np.array([i["geometry"]["coordinates"][j][0]  *2041, i["geometry"]["coordinates"][j][1]*2041])
+                nextP = np.array([i["geometry"]["coordinates"][j+1][0]  *2041, i["geometry"]["coordinates"][j+1][1]*2041])
+                l = np.linalg.norm(thisP - nextP)
+                #print(l)
+                step = np.subtract(nextP,thisP)/l/2
+
+
+                if thisP[0] < 2041 and thisP[0] > 0 and thisP[1] < 2041 and thisP[1] > 0 :
+                    if nextP[0] < 2041 and nextP[0] > 0 and nextP[1] < 2041 and nextP[1] > 0 :
+                        cbase =  altb[int(thisP[1])][int(thisP[0])]
+                        cstep = (int(altb[int(nextP[1])][int(nextP[0])]) - int(altb[int(thisP[1])][int(thisP[0])]) ) /l/2
+                
+                        for point in range(int(l)*2+1):
+
+                            newPoint = thisP + step * point
+
+                            if newPoint[0] < 2041 and newPoint[0] > 0 and newPoint[1] < 2041 and newPoint[1] > 0 :
+                                c = altb[int(newPoint[1])][int(newPoint[0])]
+                    # neighboring pixels 
+    
+
+                                if lanes == 1:
+                                    altn[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point
+                                    altm[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point
+            #roadsMask[int(py)][int(px)] = 255
+                                    roadsMask[int(newPoint[1])][int(newPoint[0])] = 255
+                                else:
+
+                                    for u in range(lanes):
+                                        for v in range(lanes):
+                                            px = newPoint[0] + u - int(lanes/2) 
+                                            py = newPoint[1] + v - int(lanes/2) 
+                                            #print(str(x) +  "   "+str(y))
+                                            if px < 2041 and px > 0 and py < 2041 and py > 0 :
+                                                        
+                                                altn[int(py)][int(px)] = cbase + cstep * point
+                                                altm[int(py)][int(px)] = cbase + cstep * point
+                                                #roadsMask[int(py)][int(px)] = 255
+
+                                                roadsMask[int(py)][int(px)] = 255
+                                
+                                    
+                                    
+
+                                    
+
+            
+
+    #cv2.imwrite(name+'/hmap_burnIn_noRiver'+name+'.png', altn)
+    #
+
+
+    '''
+    array = []
+    
+    tiff_file = "alps_rivers.tif"
+    #tiff_file = "DEM/rivers_eFrance.tif"
+    geo_tiff = GeoTiff(tiff_file, crs_code=4258, as_crs=4258)#4258
+    area_box = [(topLeft[0],topLeft[1]), (topLeft[0]+w,topLeft[1]-h)]
+    array = geo_tiff.read_box(area_box)
+    
+    rivers = Image.fromarray(np.uint8(array), "RGBA").convert('L') # or more verbose as Image.fromarray(ar32, 'I')
+
+    rivers = rivers.resize(newsize, Image.Resampling.BICUBIC)
+
+    newimdata = []
+
+    for color in rivers.getdata():
+        newimdata.append(color*256)
+    newim = Image.new('I',hmap.size)
+    newim.putdata(newimdata)
+    newim.save(name +'/rivers'+name+'.png')
+    newim.close()
+    '''
+
+
+
                                            
     roadsMask = cv2.blur(roadsMask, (2,2))
-    cv2.imwrite(name+'/hmap_burnIn_'+name+'.png', altn)
     cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)
+
+    altn = cv2.blur(altn, (2,2))
+    cv2.imwrite(name+'/hmap_burnIn_'+name+'.png', altn)
+    cv2.imwrite(name+'/hmap_burnIn_noRiver_'+name+'.png', altm)
+    #cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)
 
 def testimage():
     test = np.zeros((2041,2041,1), np.uint16)
@@ -579,6 +624,7 @@ def testimage():
     cv2.imwrite('test.png', test)
 
 
-#hightmapBurnIn((8,-31))
+#hightmapBurnIn((0,-1))
 #subtractRoadMask((1,-3))
 #testimage()
+#makeHightMap((0,-1))

@@ -2,6 +2,10 @@ import geopandas as gpd
 import json
 import copy
 import numpy as np
+
+import shapely
+from shapely import MultiLineString
+
 '''
 gj = gpd.read_file('buildings_werfenJSON.geojson', driver='GeoJSON')
 print(gj.head())
@@ -10,7 +14,32 @@ print(gj.head())
 for row in gj:
     print(row["geometry"])
 '''
+def connectLines(data):
+    shpData = shapely.from_geojson(json.dumps(data))
+    merged = shapely.line_merge(shpData)
+    mergedList = [tuple(x.coords) for x in merged.geoms]
+    print(len(data["features"]))
+    print(len(mergedList))
+    #if there is exactly one segment starting or ending with same coordinates merge them
+    '''
+    outdata={"features":[]}
+    i = 0
+    for z in data["features"]:
+        print(z)
+        last = len(z["geometry"]["coordinates"]) -1
+        thisLP = z["geometry"]["coordinates"][last]
+        
+        occur = []
+        count = 0
+        for x in data["features"]:
+            if count != i and thisLP[0] == x["geometry"]["coordinates"][0][0]:
+                occur.append(count)
+            count =+ 1
 
+        if len(occur)==1:
+            print("found one matching segement")
+    '''
+    return mergedList
 
 def findJunctions(data):
 
@@ -71,9 +100,9 @@ def combineMultiSegment(data):
 
     outdata = {}
     outdata["features"] = []
-
+    print(data["features"])
     for f in data["features"]:
-        if "bridge" in f["properties"]:
+        if f["properties"]["bridge"] =="T" :
             bridgedata["features"].append(f)
         else:
             outdata["features"].append(f)

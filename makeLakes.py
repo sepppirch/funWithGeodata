@@ -398,22 +398,25 @@ def makeRiverMesh(name):
 
 
 
-def makeRoadMesh(name):
+def makeRoadMesh(bigtile):
+    name = str(bigtile[0])+"_"+str(bigtile[1])
     size = 204000
     verts = []
     UVs = []
     tris3Lane = []
     tris2Lane = []
     tris1Lane = []
+    tris = []
     lanes = 0
-    rwidth = 0.00025
+    rwidth = 0.00022
+    depth = 40
     hmap = cv2.imread(name +'/hmap_burnIn_noRiver'+name+'.png', cv2.IMREAD_UNCHANGED)
     InstancedMeshBridges = {}
     InstancedMeshBridges["features"] = []
     f = open(name+'/roadssmooth_'+name+'.json')
     rawdata = json.load(f)
-    data = findConnectedRoads.combineMultiSegment(rawdata)
-    #data = findConnectedRoads.findJunctions(rdata)
+    data = findConnectedRoads.connectLines(rawdata)
+    #data = findConnectedRoads.findJunctions(rawdata)
     #print(data)
     segments = []
     selectedRoads = ["motorway","motorway_link","primary","secondary","trunk","unclassified"]
@@ -454,10 +457,10 @@ def makeRoadMesh(name):
                  
                 if sample["properties"]["fclass"] == "motorway":
                     lanes = 3
-                elif sample["properties"]["fclass"] == "motorway_link":
-                    lanes = 1
-                else:
+                elif sample["properties"]["fclass"] == "motorway_link" or "trunk" or "primary":
                     lanes = 2
+                else:
+                    lanes = 1
 
                 thisSegment = {}
                 thisSegment["geometry"] = {}
@@ -569,21 +572,24 @@ def makeRoadMesh(name):
                     na = (n1+n12)/2
                     nb = (n2+n22)/2
                     c = 0
+                    
                     if i == 1:
                                         # get Z coordinate from hightmap
                         c = hmap[int(s["geometry"]["coordinates"][i-1][1]*2040)][int(s["geometry"]["coordinates"][i-1][0]*2040)]*1.5625 - 51200
                         p0 = (s["geometry"]["coordinates"][i-1]+na) * size
                         p1 = (s["geometry"]["coordinates"][i-1]+nb ) * size
-                        
+
+
                         verts.append([p0[0],p0[1],c])
                         verts.append([p1[0],p1[1],c])
-                        #verts.append([p0[0],p0[1],c - depth])
-                        #verts.append([p1[0],p1[1],c - depth])
+                        verts.append([p0[0],p0[1],c - depth]+na*size)
+                        verts.append([p1[0],p1[1],c - depth]+nb*size)
+
+                        UVs.append([0.75,0]) #1
+                        UVs.append([0.25,0])
+                        UVs.append([1,0]) 
                         UVs.append([0,0])
-                        UVs.append([1,0])
-                        #UVs.append([s["lanes"],0])
-                        #UVs.append([0.15,totalLength * 1000])
-                        #UVs.append([0.45,totalLength * 1000])
+
                         segmentsCopy[count]["geometry"]["coordinates"][0][2] =  c
                    # elif i == (len(s)-1):
                                                         # get Z coordinate from hightmap
@@ -604,21 +610,23 @@ def makeRoadMesh(name):
                         c = hmap[int(s["geometry"]["coordinates"][i][1]*2040)][int(s["geometry"]["coordinates"][i][0]*2040)]*1.5625 - 51200
 
                     
+                    length = np.linalg.norm(np.subtract(s["geometry"]["coordinates"][i], s["geometry"]["coordinates"][i-1]))
+                     
                     p0 = (s["geometry"]["coordinates"][i]+na)* size
                     p1 = (s["geometry"]["coordinates"][i]+nb)* size
                     verts.append([p0[0],p0[1],c])
                     verts.append([p1[0],p1[1],c])
-                    #verts.append([p0[0],p0[1],c - depth])
-                    #verts.append([p1[0],p1[1],c - depth])
+                    verts.append([p0[0],p0[1],c - depth]+na*size)
+                    verts.append([p1[0],p1[1],c - depth]+nb*size)
 
-                    UVs.append([0,totalLength * 1000])
-                    UVs.append([1,totalLength * 1000])
-                    #UVs.append([s["lanes"],totalLength * 1000])
-                    #UVs.append([0.15,totalLength * 1000])
-                    #UVs.append([0.45,totalLength * 1000])
+                    UVs.append([0.75, totalLength * 1000]) #5
+                    UVs.append([0.25, totalLength * 1000])
+                    UVs.append([1, totalLength * 1000]) 
+                    UVs.append([0, totalLength * 1000])
                     segmentsCopy[count]["geometry"]["coordinates"][i][2] =  c
                     
                 if i < (len(s["geometry"]["coordinates"])-1):
+                        '''
                         t1 = [2 + i*2 + vl, 1 + i*2 + vl, 3 + i*2 + vl]
                         t2 = [3 + i*2 + vl, 4 + i*2 + vl, 2 + i*2 + vl]
                         '''
@@ -643,13 +651,15 @@ def makeRoadMesh(name):
                             tris3Lane.append(t1)
                             tris3Lane.append(t2)
                         '''
+                        tris.append(t1)
+                        tris.append(t2)
                         tris.append(t3)
                         tris.append(t4)
                         tris.append(t5)
                         tris.append(t6)
                         tris.append(t7)
-                        tris.append(t8
-                        ''' 
+                        tris.append(t8)
+                         
             if s["bridge"] == 1:
                 InstancedMeshBridges["features"].append(thisBridgeFeature)           
             count += 1
@@ -682,6 +692,7 @@ def makeRoadMesh(name):
 
  
             f1.write('\ng 1Lane\nusemtl 1Lane\n')
+            '''
             for t in tris1Lane:
                 line = "f " + str(t[0]) + "/" + str(t[0]) + " "+ str(t[1]) + "/" +str(t[1]) +" "+ str(t[2]) + "/"+ str(t[2]) + '\n'
                 f1.write(line)
@@ -693,6 +704,11 @@ def makeRoadMesh(name):
 
             f1.write('\ng 3Lane\nusemtl 3Lane\n')
             for t in tris3Lane:
+                line = "f " + str(t[0]) + "/" + str(t[0]) + " "+ str(t[1]) + "/" +str(t[1]) +" "+ str(t[2]) + "/"+ str(t[2]) + '\n'
+                f1.write(line)
+            '''
+            
+            for t in tris:
                 line = "f " + str(t[0]) + "/" + str(t[0]) + " "+ str(t[1]) + "/" +str(t[1]) +" "+ str(t[2]) + "/"+ str(t[2]) + '\n'
                 f1.write(line)
     else:
@@ -824,4 +840,4 @@ def cropGeoJsonLineFeature(name):
 
 #cropGeoJsonLineFeature(name)
 #makeRiverMesh("14_-15")
-#makeRoadMesh("0_-2")
+makeRoadMesh((0,-1))
