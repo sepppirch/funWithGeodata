@@ -36,7 +36,7 @@ def makeHightMap(bigtile):
     array = []
     array = geo_tiff.read_box(area_box)
     hmap = Image.fromarray(np.uint32(array), "I") # or more verbose as Image.fromarray(ar32, 'I')
-    print(hmap.size)
+    #print(hmap.size)
     newsize = (2041, 2041)
     hmap = hmap.resize(newsize, Image.Resampling.BICUBIC)
     newimdata = []
@@ -549,6 +549,18 @@ def hightmapBurnIn(bigtile):
             i["properties"]["bridge"] = "F"
         if not "highway" in i["properties"]:
             i["properties"]["highway"] = "rail"
+        if not "layer" in i["properties"]:
+            i["properties"]["layer"] = "0"
+        else:
+            lvl = 0
+            try:
+                lvl = float(i["properties"]["layer"])
+                #print(lvl)
+            except:
+                #arr = i["properties"]["layer"].split(";")
+                lvl = 0#float(arr[0].replace(",","."))
+            i["properties"]["layer"] = lvl
+            
 
         if i["properties"]["tunnel"] == "F" and i["properties"]["bridge"] == "F":
 
@@ -563,6 +575,9 @@ def hightmapBurnIn(bigtile):
             else:
                 lanes = 2
         #if i["properties"]["tunnel"] != "T" and i["properties"]["bridge"] != "T":
+
+            rdep = float(i["properties"]["layer"]) * -40
+
             for j in range(len(i["geometry"]["coordinates"])-1): #["properties"]
 
                 thisP = np.array([i["geometry"]["coordinates"][j][0]  *2041, i["geometry"]["coordinates"][j][1]*2041])
@@ -647,7 +662,7 @@ def hightmapBurnIn(bigtile):
 
     for x in range(2041):
         for y in range(2041):
-            if roadsMask[x][y]  < 128:
+            if roadsMask[x][y]  < 10:
                 #print(structure[x][y])
                 #if altn[x][y] - float(structure[x][y]) *2 > 0:
                 altn[x][y] = altn[x][y] + (float(structure[x%256][y%256]) - 120)* 1.1

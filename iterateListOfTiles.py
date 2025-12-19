@@ -55,7 +55,7 @@ c = 0
 
 
 #hightmapTiles.hightmapBurnIn((1,-1))
-makeLakes.makeRoadMesh((1,-1))
+#makeLakes.makeRoadMesh((1,-1))
 #makeLakes.makeRiverMesh("1_-3")
 
 def rename(n, oldname, suffix, newname, newpath):
@@ -63,12 +63,14 @@ def rename(n, oldname, suffix, newname, newpath):
     destination_path = newpath + newname+"_" + newnames[c]+suffix
     copyfiles(src_path,destination_path)
 
+x = 0
 
 for n in names:
     add = n.split("_")
     bigtile = (int(add[0]),int(add[1]))
     #print(n)
     try:
+        x = 1
         #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-selected-smooth.geojson','roadssmooth')
         #makeBuildingGeometry.filterBuildings(n)
         #makeBuildingGeometry.makeBuildings(n)
@@ -78,9 +80,9 @@ for n in names:
         #hightmapTiles.hightmapBurnIn(bigtile)
         #makeLakes.makeRoadMesh(bigtile)
         #makeLakes.makeRiverMesh(n)
-        print(n)
+        #print(n)
         #overpassQuery.cropGeoJsonPoly(bigtile,'geojson_src/A_trains.geojson','rail')
-        #postprocessHmap.closegaps(bigtile)
+        postprocessHmap.closegaps(bigtile)
         #rename(n,"hmap_burnIn",".png","h",'worldmachine_F/2041/hmap_burnIn_/')
         #rename(n,"rivers",".obj","river",'worldmachine_json/rivers/')
         #rename(n,"roads",".obj","rw",'worldmachine_json/roads/')

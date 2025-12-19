@@ -424,6 +424,7 @@ def makeRoadMesh(bigtile):
     tris3Lane = []
     tris2Lane = []
     tris1Lane = []
+    trisRail = []
     tris = []
     lanes = 0
     rwidth = 0.0008
@@ -446,7 +447,7 @@ def makeRoadMesh(bigtile):
         rawdata["features"].append(r)
 
     lanes3 = ["motorway","motorway_link"]
-    lanes2 = ["primary","trunk","secondary","rail"]
+    lanes2 = ["primary","trunk","secondary"]
 #3 lanes
     roads = {"type": "FeatureCollection", "features": []}
     bridges = {"type": "FeatureCollection", "features": []}
@@ -457,6 +458,9 @@ def makeRoadMesh(bigtile):
 # 1 Lane
     roads1 = {"type": "FeatureCollection", "features": []}
     bridges1 = {"type": "FeatureCollection", "features": []}
+# RAIL
+    roadsR = {"type": "FeatureCollection", "features": []}
+    bridgesR = {"type": "FeatureCollection", "features": []}
     print("xxx")
     print(len(rawdata["features"]))
     for s in rawdata["features"]:
@@ -474,8 +478,11 @@ def makeRoadMesh(bigtile):
                     bridges2["features"].append(s)
                 else:
                     roads2["features"].append(s)
-                    #if s["properties"]["fclass"] == "rail":
-                        #print(s)
+            elif s["properties"]["fclass"] == "rail":
+                if s["properties"]["bridge"] == "T" :
+                    bridgesR["features"].append(s)
+                else:
+                    roadsR["features"].append(s)
 
             else:
                 if s["properties"]["bridge"] == "T" :
@@ -491,27 +498,35 @@ def makeRoadMesh(bigtile):
     #tunnelsconnected = findConnectedRoads.connectLines(tunnels, "motorway", "F")
     roadsconnected = findConnectedRoads.connectLines(roads, "motorway", "F")
     bridgesconnected = findConnectedRoads.connectLines(bridges, "motorway", "T")
+
     roadsconnected2 = findConnectedRoads.connectLines(roads2, "primary", "F")
-    
     bridgesconnected2 = findConnectedRoads.connectLines(bridges2, "primary", "T")
     roadsconnected1 = findConnectedRoads.connectLines(roads1, "secondary", "F")
     bridgesconnected1 = findConnectedRoads.connectLines(bridges1, "secondary", "T")
+
+    roadsconnectedR = findConnectedRoads.connectLines(roadsR, "rail", "F")
+    bridgesconnectedR = findConnectedRoads.connectLines(bridgesR, "rail", "T")
+
+    print(roadsR)
+    print(roadsconnectedR)
+
     data = {"type": "FeatureCollection", "features": []}
-    data["features"] = roadsconnected + bridgesconnected + roadsconnected2 + bridgesconnected2 + roadsconnected1 + bridgesconnected1 
+    data["features"] = roadsconnected + bridgesconnected + roadsconnected2 + bridgesconnected2 + roadsconnected1 + bridgesconnected1 + roadsconnectedR + bridgesconnectedR
     #data["features"] = roads["features"] + bridges["features"] + roads2["features"] + bridges2["features"] + roads1["features"] + bridges1["features"]
     ''''''
     #data["features"] + bridgesconnected
     #print(str(len(data["features"])) + "   ---  " + str(len(rawdata["features"])))
     segments = []
-    selectedRoads = ["motorway","motorway_link","primary","secondary","trunk","trunk_link","unclassified", "tertiary", "service","residential","primary_link","secondary_link","rail" ]
+    selectedRoads = ["motorway","motorway_link","primary","secondary","trunk","trunk_link","unclassified", "tertiary", "service","residential","primary_link","secondary_link","rail"]
     thisroads = {}
     thisroads["features"] = []
     import random
-
+    print(data["features"][len(data["features"])-1])
 
     if len(data["features"]) > 0 :
         
         # first, cut segments at tile borders
+        
         for sample in data["features"]:
             
             '''
@@ -543,9 +558,9 @@ def makeRoadMesh(bigtile):
             if sample["properties"]["fclass"] in selectedRoads:
 
                 if sample["properties"]["fclass"] == "rail":
-                    print(sample)
-                
-                if sample["properties"]["fclass"] == "motorway":
+                    lanes = 4
+                    print("ree")
+                elif sample["properties"]["fclass"] == "motorway":
                     lanes = 3
                 elif sample["properties"]["fclass"] == "primary":
                     lanes = 2
@@ -584,6 +599,7 @@ def makeRoadMesh(bigtile):
                 count = 0
                 for p in sample["geometry"]["coordinates"]:
                     count += 1
+                    
                     if p[0] < 1 and p[0] > 0 and p[1] < 1 and p[1] > 0 :
                         
                         if not isInside:
@@ -605,11 +621,12 @@ def makeRoadMesh(bigtile):
                             thisSegment = {}
                             thisSegment["geometry"] = {}
                             thisSegment["geometry"]["coordinates"] = []
-                            thisSegment["lanes"] = 0
+                            thisSegment["lanes"] = 0#sample["lanes"]
                             thisSegment["bridge"] = 0
                             thisSegment["tunnel"] = 0
+                            
                             isInside = False
-                            #print(p)
+                            #print(sample)
                         #print("outside")
                     if count == len(p):
                         segments.append(thisSegment)
@@ -619,7 +636,7 @@ def makeRoadMesh(bigtile):
         count = 0   
 
         segmentsCopy = copy.deepcopy(segments)
-               
+        print(segmentsCopy[10])     
         for s in segments:
             randomoffset = random.randint(-3, 3)
             stoffset = 0
@@ -653,35 +670,38 @@ def makeRoadMesh(bigtile):
             for i in range(len(s["geometry"]["coordinates"])):
                 widthmulti = 1
                 if s["lanes"] == 1:
-                    widthmulti = 0.3
+                    widthmulti = 0.2
                 elif s["lanes"] == 2:
                     widthmulti = 0.4
                 elif s["lanes"] == 3:
                     widthmulti = 0.6
+                elif s["lanes"] == 4:
+                    widthmulti = 0.14
+                #print(s["lanes"])
 
                 
 
-                if i > 0:
+                if i > 0 :
                     AB = np.subtract(s["geometry"]["coordinates"][i-1], s["geometry"]["coordinates"][i])
+                    BC = AB
+                    if i < (len(s["geometry"]["coordinates"])-2):
+                        BC = np.subtract(s["geometry"]["coordinates"][i], s["geometry"]["coordinates"][i+1])
 
                     length = np.linalg.norm(AB)
+                    length1 = np.linalg.norm(BC)
                     
 
 
                     totalLength += length
+                    
                     n1 = ([AB[1]*-1, AB[0],0]/length) * rwidth * widthmulti
                     n2 = n1 *-1
-                    n12 = n1
-                    n22 = n2
-                    '''
-                    if i < len(s["geometry"]["coordinates"])-1:
-                        BC = np.subtract(s["geometry"]["coordinates"][i], s["geometry"]["coordinates"][i+1])
-                        length2 = np.linalg.norm(BC)
-                        n12 = ([BC[1]*-1, BC[0],0]/length2) * rwidth * s["lanes"]
-                        n22 = n12 *-1
-                    '''
+                    n12 = ([BC[1]*-1, BC[0],0]/length1) * rwidth * widthmulti
+                    n22 = n12 *-1
+
                     na = (n1+n12)/2
                     nb = (n2+n22)/2
+
                     c = 0
                     if s["bridge"] == 1:
                         depth = 30
@@ -736,8 +756,25 @@ def makeRoadMesh(bigtile):
 
                         c = c*1.5625 - 51200
                     
-                    length = np.linalg.norm(np.subtract(s["geometry"]["coordinates"][i], s["geometry"]["coordinates"][i-1]))
-                     
+                #if i == (len(s["geometry"]["coordinates"])-1):
+                    '''  
+                    BC = np.subtract(s["geometry"]["coordinates"][i-1], s["geometry"]["coordinates"][i])
+
+                    
+                    length1 = np.linalg.norm(BC)
+                    
+
+
+                    totalLength += length1
+                    
+                 
+                    n12 = ([BC[1]*-1, BC[0],0]/length1) * rwidth * widthmulti
+                    n22 = n12 *-1
+
+                    na = n12
+                    nb = n22
+                    #length = np.linalg.norm(np.subtract(s["geometry"]["coordinates"][i], s["geometry"]["coordinates"][i-1]))
+                    ''' 
                     p0 = (s["geometry"]["coordinates"][i]+na)* size
                     p1 = (s["geometry"]["coordinates"][i]+nb)* size
 
@@ -766,8 +803,19 @@ def makeRoadMesh(bigtile):
                         t6 = [2 + i*4 + vl, 6 + i*4 + vl, 8 + i*4 + vl]
                         t7 = [7 + i*4 + vl, 3 + i*4 + vl, 4 + i*4 + vl]
                         t8 = [4 + i*4 + vl, 8 + i*4 + vl, 7 + i*4 + vl]                        
-                        
-                        if s["lanes"] == 1:
+                         
+                        if s["lanes"] == 4:
+                            trisRail.append(t1)
+                            trisRail.append(t2)
+                            trisRail.append(t3)
+                            trisRail.append(t4)
+                            trisRail.append(t5)
+                            trisRail.append(t6)
+                            trisRail.append(t7)
+                            trisRail.append(t8)
+                            print("train")
+                        elif s["lanes"] == 1:
+                            
                             tris1Lane.append(t1)
                             tris1Lane.append(t2)
                             tris1Lane.append(t3)
@@ -776,9 +824,8 @@ def makeRoadMesh(bigtile):
                             tris1Lane.append(t6)
                             tris1Lane.append(t7)
                             tris1Lane.append(t8)
-                            
 
-                        if s["lanes"] == 2:
+                        elif s["lanes"] == 2:
                             tris2Lane.append(t1)
                             tris2Lane.append(t2)
                             tris2Lane.append(t3)
@@ -789,7 +836,7 @@ def makeRoadMesh(bigtile):
                             tris2Lane.append(t8)
                             
 
-                        if s["lanes"] == 3:
+                        elif s["lanes"] == 3:
                             tris3Lane.append(t1)
                             tris3Lane.append(t2)
                             tris3Lane.append(t3)
@@ -821,6 +868,21 @@ def makeRoadMesh(bigtile):
             #print(np.linalg.norm(AB)*1000)
         print("---------------")
         #print(segments)
+
+        verts.append([0.0,0.0,0.0])
+        verts.append([0.0,0.01,0.0])
+        verts.append([0.01,0.0,0.0])
+
+        UVs.append([0.0,0.0])
+        UVs.append([0.0,0.01])
+        UVs.append([0.01,0.0])
+
+        tris1Lane.append([len(verts)-1,len(verts)-2,len(verts)-3])
+        tris2Lane.append([len(verts)-1,len(verts)-2,len(verts)-3])
+        tris3Lane.append([len(verts)-1,len(verts)-2,len(verts)-3])
+        trisRail.append([len(verts)-1,len(verts)-2,len(verts)-3])
+
+
         for t in tunnels["features"]:
             l = len(t["coordinates"])-1
             fcoords = [fix(t["coordinates"][0][0]), fix(t["coordinates"][0][1])]
@@ -876,6 +938,11 @@ def makeRoadMesh(bigtile):
 
             f1.write('\ng 3Lane\nusemtl 3Lane\n')
             for t in tris3Lane:
+                line = "f " + str(t[0]) + "/" + str(t[0]) + " "+ str(t[1]) + "/" +str(t[1]) +" "+ str(t[2]) + "/"+ str(t[2]) + '\n'
+                f1.write(line)
+
+            f1.write('\ng rail\nusemtl rail\n')
+            for t in trisRail:
                 line = "f " + str(t[0]) + "/" + str(t[0]) + " "+ str(t[1]) + "/" +str(t[1]) +" "+ str(t[2]) + "/"+ str(t[2]) + '\n'
                 f1.write(line)
             

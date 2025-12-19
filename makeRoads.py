@@ -184,4 +184,4 @@ def makeRoadMesh(bigtile):
             line = "f " + str(t[0]) + "/" + str(t[0]) + " "+ str(t[1]) + "/" +str(t[1]) +" "+ str(t[2]) + "/"+ str(t[2]) + '\n'
             f1.write(line)
 
-makeRoadMesh((0,-1))
+makeRoadMesh((1,-1))
