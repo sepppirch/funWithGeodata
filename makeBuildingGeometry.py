@@ -51,7 +51,7 @@ def makeBuildings(name):
     randMat = 0
 
     ##print(len(data["features"]))
-    UVs = [[0.0,0.0],[0.0,1],[1,1],[1,0]]
+    UVs = [[0.0,0.0],[0.0,1],[1,1],[1,0],[2,0.5]]
 
     for sample in range (len(data["features"])-1):#data["features"]:
     #for sample in range (1000):
@@ -67,7 +67,7 @@ def makeBuildings(name):
         ring4 = []
         buildingHeight = 0
         circumference = 0        
-
+        woodhouse = False
         #poly = varray[sample]   
         
         if "height" in data["features"][sample]["properties"]:
@@ -152,9 +152,9 @@ def makeBuildings(name):
         #print(buildingHeight)
         if buildingHeight == 0:
             #print(circumference)
-            buildingHeight = int(circumference*40000)+1 * 100
+            buildingHeight = int(circumference*40000)+ 1 * 75
             
-            if buildingHeight > 800:
+            if buildingHeight > 400:
                 buildingHeight = random.randint(2,3) * 100
         #print(circumference)
 
@@ -169,9 +169,9 @@ def makeBuildings(name):
                 polyRed.insert(0,lastP)
                 polyRed.pop()
                 #print(polyRed)
-            randMat = random.randint(0,1)
+            randMat = random.randint(1,2)
         else:
-            randMat = random.randint(2,4)
+            randMat = random.randint(3,4)
 
 
 
@@ -244,6 +244,7 @@ def makeBuildings(name):
                             tp1 = [p[0],p[1]]
                             workverts.append(tp) 
                             ring4.append(tp1)
+
                     elif ringcount == 4:
                         
                         A = ring2[0]
@@ -253,20 +254,55 @@ def makeBuildings(name):
 
                         AD = np.subtract(D, A)
                         BC = np.subtract(C, B)
+                        AB = np.subtract(A, B)
+                        ABn = AB/ np.linalg.norm(AB) *30
                         roofangle = random.randint(2,4) 
                         G1 = A + AD/2 + [0,0,np.linalg.norm(AD)/roofangle]
                         G2 = B + BC/2 + [0,0,np.linalg.norm(BC)/roofangle]
+                        G3 = G1 + ABn
+                        G4 = G2 - ABn
+                        AG1 = np.subtract(A, G1)
+                        DG1 = np.subtract(D, G1)
+                        G5 = G3 + AG1*1.25
+                        G7 = G3 + DG1*1.25
+                        G6 = G4 + AG1*1.25
+                        G8 = G4 + DG1*1.25
+
                         workverts.append(G1)
                         workverts.append(G2)
+                        workverts.append(G3)
+                        workverts.append(G4)
+                        workverts.append(G5)
+                        workverts.append(G6)
+                        workverts.append(G7)
+                        workverts.append(G8)
                     #else:
                         ##print("less then 4 points")
+                        woodhouse = True
 
-
-
+                    for i in range(ringcount):
+                        # get length of segment for UVS
+                        
+                        rows = 2
+                        #col = int(buildingHeight/100)
+                        a = workverts[i]
+                        b = workverts[(i+1)%ringcount]
+                        ba = np.subtract(b, a)
+                        lenAB= np.linalg.norm(ba)/100
+                        if lenAB > 1:
+                            rows = int(lenAB)
+                        else: 
+                            rows = 1
+                        if rows % 2 == 1:
+                            woodhouse = False
+                        #print(str(rows))
+                    if woodhouse: 
+                        randMat = 0
 
                     # MAKE TRIANGLES FOR WALLS
                     ringNum = 0
                     door = 0
+
                     for i in range(ringcount):
                         # get length of segment for UVS
                         
@@ -280,6 +316,8 @@ def makeBuildings(name):
                             rows = int(lenAB)
                         else: 
                             rows = lenAB
+
+                        #print(str(col) + "---" + str(rows))
 
                         walluvs=[[0.0,0.0],[0.0,rows],[col,rows],[col,0]]
 
@@ -359,14 +397,25 @@ def makeBuildings(name):
                     
                     
                     elif ringcount == 4:
-                        t1 = [9+ lengthVerts,0,5+ lengthVerts,1,4+ lengthVerts,2]
-                        t2 = [4+ lengthVerts,2,8+ lengthVerts,3,9+ lengthVerts,0]
+                        '''
+                        t1 = [9+ lengthVerts,0, 5+ lengthVerts,1, 4+ lengthVerts,2]
+                        t2 = [4+ lengthVerts,2, 8+ lengthVerts,3, 9+ lengthVerts,0]
 
-                        t3 = [8+ lengthVerts,0,7+ lengthVerts,1,6+ lengthVerts,2]
-                        t4 = [6+ lengthVerts,2,9+ lengthVerts,3,8+ lengthVerts,0]
+                        t3 = [8+ lengthVerts,0, 7+ lengthVerts,1, 6+ lengthVerts,2]
+                        t4 = [6+ lengthVerts,2, 9+ lengthVerts,3, 8+ lengthVerts,0]
+                        '''
+                        t1 = [11+ lengthVerts,0, 13+ lengthVerts,1, 12+ lengthVerts,2]
+                        t2 = [12+ lengthVerts,2, 10+ lengthVerts,3, 11+ lengthVerts,0]
 
-                        t5 = [9+ lengthVerts,0, 6+ lengthVerts,1,5 + lengthVerts,2]
-                        t6 = [8+ lengthVerts,0, 4+ lengthVerts,1,7 + lengthVerts,2]
+                        t3 = [10+ lengthVerts,0, 14+ lengthVerts,1, 15+ lengthVerts,2]
+                        t4 = [15+ lengthVerts,2, 11+ lengthVerts,3, 10+ lengthVerts,0]
+
+                        #t5 = [9+ lengthVerts,4, 6+ lengthVerts,0, 6 + lengthVerts,1]
+                        #t6 = [8+ lengthVerts,4, 4+ lengthVerts,0, 7 + lengthVerts,1]
+                        
+                        t5 = [5+ lengthVerts,0, 9+ lengthVerts,4, 6 + lengthVerts,1]
+                        t6 = [7+ lengthVerts,1, 8+ lengthVerts,4, 4 + lengthVerts,0]
+
                         trianglesRoof[randMat].append(t1)
                         trianglesRoof[randMat].append(t2)
 
@@ -439,12 +488,13 @@ def filterBuildings(name):
 
     for sample in data["features"]:
         sample["area"] = Area(sample["geometry"]["coordinates"])
-        dataF["features"].append(sample)
-            #print(sample)
+        if sample["area"] > 10:
+            dataF["features"].append(sample)
+         
     dataF["features"].sort(key = lambda json: json['area'], reverse=True)
     #print(dataF)
-    if len(dataF["features"])>2000:
-        dataF["features"]=dataF["features"][0:2000]
+    if len(dataF["features"])>4000:
+        dataF["features"]=dataF["features"][0:4000]
 
     with open(name +'/buildings_reduced_'+name+'.json', 'w') as f:
         json.dump(dataF, f)
@@ -462,5 +512,5 @@ def Area(corners):
     #print (area*10000000)
     return area*10000000
 
-#filterBuildings("34_-38")
-#makeBuildings("34_-38")
+#filterBuildings("2_-4")
+#makeBuildings("2_-4")

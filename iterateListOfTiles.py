@@ -5,7 +5,7 @@ from shutil import copy
 import os.path
 import makeLakes
 import postprocessHmap
-#import makeBuildingGeometry
+import makeBuildingGeometry
 import makeLandscapeMesh
 import normalfromhightmap
 import cv2
@@ -52,23 +52,56 @@ with open('F_quarter.geojson', 'r') as file:
 
 
 c = 0
+
+
+#hightmapTiles.hightmapBurnIn((1,-1))
+makeLakes.makeRoadMesh((1,-1))
+#makeLakes.makeRiverMesh("1_-3")
+
+def rename(n, oldname, suffix, newname, newpath):
+    src_path = n +'/'+oldname+"_"+n+suffix
+    destination_path = newpath + newname+"_" + newnames[c]+suffix
+    copyfiles(src_path,destination_path)
+
+
 for n in names:
     add = n.split("_")
     bigtile = (int(add[0]),int(add[1]))
-    '''
+    #print(n)
     try:
-        #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-smoothed_1.geojson','roadssmooth')
+        #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-selected-smooth.geojson','roadssmooth')
+        #makeBuildingGeometry.filterBuildings(n)
+        #makeBuildingGeometry.makeBuildings(n)
+        #makeLakes.makeRoadMesh(bigtile)
+        #src_path = n +'/'+"building_s_"+n+'.obj'
+        #destination_path = 'worldmachine_json/buildings_test/b_'+newnames[c]+'.obj'
+        #hightmapTiles.hightmapBurnIn(bigtile)
+        #makeLakes.makeRoadMesh(bigtile)
+        #makeLakes.makeRiverMesh(n)
+        print(n)
+        #overpassQuery.cropGeoJsonPoly(bigtile,'geojson_src/A_trains.geojson','rail')
+        #postprocessHmap.closegaps(bigtile)
+        #rename(n,"hmap_burnIn",".png","h",'worldmachine_F/2041/hmap_burnIn_/')
+        #rename(n,"rivers",".obj","river",'worldmachine_json/rivers/')
+        #rename(n,"roads",".obj","rw",'worldmachine_json/roads/')
+        #rename(n,"Bridges",".json","bridge",'worldmachine_json/bridges/')
+
+        #src_path = n +'/'+"roads_"+n+'.obj'
+        #destination_path = 'worldmachine_json/newroads/rw_'+newnames[c]+'.obj'
         
-        makeLakes.makeRoadMesh(bigtile)
-    except:
-        print("error")
+        #src_path = n +'/'+"Bridges_"+n+'.json'
+        #destination_path = 'worldmachine_json/bridges/bridge_'+newnames[c]+'.json'
+
+    
+        #copyfiles(src_path,destination_path)
+    except Exception as e: print(e)
     '''
-    #hightmapTiles.hightmapBurnIn(bigtile)
+    #
     #postprocessHmap.closegaps(bigtile)
     #postprocessHmap.closegaps((int(add[0]),int(add[1])))
     #print("{"+ str(add[0])+","+str(add[1])+"},")
     #segmentSatImage.segment(n)
-    print(n)
+    
     #
     #landuse.makeMasksfromLanduse(bigtile)
     
@@ -78,7 +111,7 @@ for n in names:
     #makeLakes.makeRoadMesh(n)
     copyfiles(src_path,destination_path)
     #thermalcalculator.searchCountures(bigtile)
-
+    '''
     c += 1
     '''
     Mask = np.zeros( (2041,2041,1), dtype=np.uint8)

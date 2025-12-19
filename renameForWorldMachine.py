@@ -13,7 +13,7 @@ with open('tileselection.geojson', 'r') as file:
         n = f["properties"]["name"].split("|")
         names.append(n[1][1:])
 
-print(names)
+#print(names)
 
 bottomLeft = [16  ,-31]
 w = 18
@@ -24,8 +24,8 @@ for x in range (18):
 
 
 
-        wpath = "worldmachine_D"
-        bigtile = (bottomLeft[1] + y - 18, bottomLeft[0] - x )
+        wpath = "worldmachine_F/2041/"
+        bigtile = (bottomLeft[1] + y + 18, bottomLeft[0] - x )
         
         name = str(bigtile[1])+"_"+str(bigtile[0])
         print(name)
@@ -63,7 +63,7 @@ for x in range (18):
         src_path = name +'/hmap_burnIn_'+name+'.png'
         destination_path = wpath +'/hmaps/h'+newname+'.png'
         copy(src_path, destination_path)
-        
+        '''
 
 
 
@@ -79,7 +79,7 @@ for x in range (18):
         src_path = name +'/grassn'+name+'.png'
         destination_path = wpath+'/grass/g'+newname+'.png'
         copy(src_path, destination_path)
-        '''
+        
 
         
         src_path = name +'/roadsmask'+name+'.png'

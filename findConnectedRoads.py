@@ -14,32 +14,49 @@ print(gj.head())
 for row in gj:
     print(row["geometry"])
 '''
-def connectLines(data):
-    shpData = shapely.from_geojson(json.dumps(data))
-    merged = shapely.line_merge(shpData)
-    mergedList = [tuple(x.coords) for x in merged.geoms]
-    print(len(data["features"]))
-    print(len(mergedList))
-    #if there is exactly one segment starting or ending with same coordinates merge them
-    '''
-    outdata={"features":[]}
-    i = 0
-    for z in data["features"]:
-        print(z)
-        last = len(z["geometry"]["coordinates"]) -1
-        thisLP = z["geometry"]["coordinates"][last]
-        
-        occur = []
-        count = 0
-        for x in data["features"]:
-            if count != i and thisLP[0] == x["geometry"]["coordinates"][0][0]:
-                occur.append(count)
-            count =+ 1
+def connectLines(data, fclass, bridge):
+    #print(data["features"])
+    if len(data["features"])>0:
+        shpData = shapely.from_geojson(json.dumps(data))
+        merged = shapely.line_merge(shpData , directed=True)
+        #print(merged)
 
-        if len(occur)==1:
-            print("found one matching segement")
-    '''
-    return mergedList
+        if hasattr(merged, "geoms"):
+            mergedList = [tuple(x.coords) for x in merged.geoms]
+            
+            #print(len(mergedList))
+            outlist = []
+            for sample in mergedList:
+                thisgeo = []
+                thisfeature = { "properties": {"bridge": bridge, "tunnel": "F","fclass": fclass}, "geometry": {"type": "LineString","coordinates": []}}
+                for p in sample:    
+                    thisgeo.append([float(p[0]),float(p[1])])
+                thisfeature["geometry"]["coordinates"] = thisgeo
+                outlist.append(thisfeature)
+            #if there is exactly one segment starting or ending with same coordinates merge them
+            '''
+            outdata={"features":[]}
+            i = 0
+            for z in data["features"]:
+                print(z)
+                last = len(z["geometry"]["coordinates"]) -1
+                thisLP = z["geometry"]["coordinates"][last]
+                
+                occur = []
+                count = 0
+                for x in data["features"]:
+                    if count != i and thisLP[0] == x["geometry"]["coordinates"][0][0]:
+                        occur.append(count)
+                    count =+ 1
+
+                if len(occur)==1:
+                    print("found one matching segement")
+            '''
+            return outlist
+        else:
+            return data["features"]
+    else:
+        return data["features"]
 
 def findJunctions(data):
 

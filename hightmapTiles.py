@@ -260,22 +260,36 @@ def hightmapBurnIn(bigtile):
 
     
 
-    lake = cv2.imread(name +'/lake'+name+'.png', cv2.IMREAD_UNCHANGED) 
+    lake = cv2.imread(name +'/lake'+name+'.png', cv2.IMREAD_UNCHANGED)
+    structure = cv2.imread('struct1.png', cv2.IMREAD_GRAYSCALE)
+    print(structure.shape)
+
+    kernel = np.ones((8, 8), np.uint8)
+    lake = cv2.erode(lake, kernel) 
+
     #rivers = cv2.imread(name +'/rivers'+name+'.png', cv2.IMREAD_UNCHANGED)
 
     roadsMask = np.zeros( (2041,2041,1), dtype=np.uint8 )
 
-    ksize = (50, 50)
-    ksize1 = (10, 10)  
+    ksize = (5, 5)
+    ksize1 = (3, 3)  
     
     # Using cv2.blur() method  
     lakeb = cv2.blur(lake, ksize)  
     lakeb1 = cv2.blur(lake, ksize1)  
+   
+
+# Using cv2.erode() method 
+    
+
+# Displaying the image 
+
     # Displaying the image  
 
 
     altn = np.copy(alt)
     altm = np.copy(alt)
+    altl = np.copy(alt)
     
     ksize = (5,5)
 
@@ -288,10 +302,13 @@ def hightmapBurnIn(bigtile):
 
     for x in range(2041):
         for y in range(2041):
-            if (alt[x][y] - lakeb[x][y]/100 - lakeb1[x][y]/100) > 0:
-                altn[x][y] = altn[x][y] - lakeb[x][y]/200 - lakeb1[x][y]/200 #- rivers[x][y]/100
-            else:
-                altn[x][y] = 0
+            if lakeb[x][y] > 200:
+                if (alt[x][y] - lakeb[x][y]/100 - lakeb1[x][y]/100) > 0:
+                    altn[x][y] = altn[x][y] - lakeb[x][y]/200 - lakeb1[x][y]/200
+                    altl[x][y] = altn[x][y]
+                else:
+                    altn[x][y] = 0
+                    altl[x][y] = 0
 
     # RIVERS
                                 
@@ -316,8 +333,8 @@ def hightmapBurnIn(bigtile):
 
                 if thisP[0] < 2041 and thisP[0] > 0 and thisP[1] < 2041 and thisP[1] > 0 :
                     if nextP[0] < 2041 and nextP[0] > 0 and nextP[1] < 2041 and nextP[1] > 0 :
-                        cbase =  alt[int(thisP[1])][int(thisP[0])] 
-                        cstep = (int(alt[int(nextP[1])][int(nextP[0])]) - int(alt[int(thisP[1])][int(thisP[0])]) ) /l/2
+                        cbase =  altl[int(thisP[1])][int(thisP[0])] 
+                        cstep = (int(altl[int(nextP[1])][int(nextP[0])]) - int(altl[int(thisP[1])][int(thisP[0])]) ) /l/2
                         if abs(cstep) < 1:
                 # neighboring pixels
                             for point in range(int(l)*2+1):
@@ -325,7 +342,7 @@ def hightmapBurnIn(bigtile):
                                 newPoint = thisP + step * point
 
                                 if newPoint[0] < 2041 and newPoint[0] > 0 and newPoint[1] < 2041 and newPoint[1] > 0 :
-                                    c = alt[int(newPoint[1])][int(newPoint[0])]
+                                    c = altl[int(newPoint[1])][int(newPoint[0])]
 
                                     for u in range(9):
                                         for v in range(9):
@@ -356,8 +373,8 @@ def hightmapBurnIn(bigtile):
 
                 if thisP[0] < 2041 and thisP[0] > 0 and thisP[1] < 2041 and thisP[1] > 0 :
                     if nextP[0] < 2041 and nextP[0] > 0 and nextP[1] < 2041 and nextP[1] > 0 :
-                        cbase =  alt[int(thisP[1])][int(thisP[0])] 
-                        cstep = (int(alt[int(nextP[1])][int(nextP[0])]) - int(alt[int(thisP[1])][int(thisP[0])]) ) /l/2
+                        cbase =  altl[int(thisP[1])][int(thisP[0])] 
+                        cstep = (int(altl[int(nextP[1])][int(nextP[0])]) - int(altl[int(thisP[1])][int(thisP[0])]) ) /l/2
                         if abs(cstep) < 3:
                 # neighboring pixels
                             for point in range(int(l)*2+1):
@@ -365,7 +382,7 @@ def hightmapBurnIn(bigtile):
                                 newPoint = thisP + step * point
 
                                 if newPoint[0] < 2041 and newPoint[0] > 0 and newPoint[1] < 2041 and newPoint[1] > 0 :
-                                    c = alt[int(newPoint[1])][int(newPoint[0])]
+                                    c = altl[int(newPoint[1])][int(newPoint[0])]
 
                                     for u in range(7):
                                         for v in range(7):
@@ -395,8 +412,8 @@ def hightmapBurnIn(bigtile):
 
                 if thisP[0] < 2041 and thisP[0] > 0 and thisP[1] < 2041 and thisP[1] > 0 :
                     if nextP[0] < 2041 and nextP[0] > 0 and nextP[1] < 2041 and nextP[1] > 0 :
-                        cbase =  alt[int(thisP[1])][int(thisP[0])] 
-                        cstep = (int(alt[int(nextP[1])][int(nextP[0])]) - int(alt[int(thisP[1])][int(thisP[0])]) ) /l/2
+                        cbase =  altl[int(thisP[1])][int(thisP[0])] 
+                        cstep = (int(altl[int(nextP[1])][int(nextP[0])]) - int(altl[int(thisP[1])][int(thisP[0])]) ) /l/2
                         if abs(cstep) < 5:
                 # neighboring pixels
                             for point in range(int(l)*2+1):
@@ -404,7 +421,7 @@ def hightmapBurnIn(bigtile):
                                 newPoint = thisP + step * point
 
                                 if newPoint[0] < 2041 and newPoint[0] > 0 and newPoint[1] < 2041 and newPoint[1] > 0 :
-                                    c = alt[int(newPoint[1])][int(newPoint[0])]
+                                    c = altl[int(newPoint[1])][int(newPoint[0])]
                                 
                                     for u in range(5):
                                         for v in range(5):
@@ -437,15 +454,15 @@ def hightmapBurnIn(bigtile):
 
                 if thisP[0] < 2041 and thisP[0] > 0 and thisP[1] < 2041 and thisP[1] > 0 :
                     if nextP[0] < 2041 and nextP[0] > 0 and nextP[1] < 2041 and nextP[1] > 0 :
-                        cbase =  alt[int(thisP[1])][int(thisP[0])] 
-                        cstep = (int(alt[int(nextP[1])][int(nextP[0])]) - int(alt[int(thisP[1])][int(thisP[0])]) ) /l/2
+                        cbase =  altl[int(thisP[1])][int(thisP[0])] 
+                        cstep = (int(altl[int(nextP[1])][int(nextP[0])]) - int(altl[int(thisP[1])][int(thisP[0])]) ) /l/2
                 # neighboring pixels
                         for point in range(int(l)*2+1):
 
                             newPoint = thisP + step * point
 
                             if newPoint[0] < 2041 and newPoint[0] > 0 and newPoint[1] < 2041 and newPoint[1] > 0 :
-                                c = alt[int(newPoint[1])][int(newPoint[0])]
+                                c = altl[int(newPoint[1])][int(newPoint[0])]
 
                                 for u in range(3):
                                     for v in range(3):
@@ -510,22 +527,41 @@ def hightmapBurnIn(bigtile):
 
     f = open(name+'/roads_'+name+'.json')
     data = json.load(f)
+    r = open(name+'/rail_'+name+'.json')
+    rdata = json.load(r)
+    for r in rdata["features"]:
+        data["features"].append(r)
+        #print(r)
     lanes = 1
+    rdep = 0
     Roads3l = ["motorway_link","trunk","primary"]
-    Roads2l = ["secondary","unclassified","tertiary","service"]
+    Roads2l = ["secondary","unclassified","tertiary","service","rail"]
+
+
+
+
     for i in data["features"]:
-        if not "tunnel" in i["properties"].keys() and not "bridge" in i["properties"].keys():
+
+        if not "tunnel" in i["properties"]:
+            #print(i)
+            i["properties"]["tunnel"] = "F"
+        if not "bridge" in i["properties"]:
+            i["properties"]["bridge"] = "F"
+        if not "highway" in i["properties"]:
+            i["properties"]["highway"] = "rail"
+
+        if i["properties"]["tunnel"] == "F" and i["properties"]["bridge"] == "F":
 
             if i["properties"]["highway"] == "motorway":
-                lanes = 4
+                lanes = 5
                 #print("highway")
                 #print(i["properties"]["highway"])
             elif i["properties"]["highway"] in Roads3l:
-                lanes = 3
+                lanes = 4
             elif i["properties"]["highway"] in Roads2l:
-                lanes = 2
+                lanes = 3
             else:
-                lanes = 1
+                lanes = 2
         #if i["properties"]["tunnel"] != "T" and i["properties"]["bridge"] != "T":
             for j in range(len(i["geometry"]["coordinates"])-1): #["properties"]
 
@@ -551,8 +587,8 @@ def hightmapBurnIn(bigtile):
     
 
                                 if lanes == 1:
-                                    altn[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point
-                                    altm[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point
+                                    altn[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point - rdep
+                                    altm[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point- rdep
             #roadsMask[int(py)][int(px)] = 255
                                     roadsMask[int(newPoint[1])][int(newPoint[0])] = 255
                                 else:
@@ -564,8 +600,8 @@ def hightmapBurnIn(bigtile):
                                             #print(str(x) +  "   "+str(y))
                                             if px < 2041 and px > 0 and py < 2041 and py > 0 :
                                                         
-                                                altn[int(py)][int(px)] = cbase + cstep * point
-                                                altm[int(py)][int(px)] = cbase + cstep * point
+                                                altn[int(py)][int(px)] = cbase + cstep * point - rdep
+                                                altm[int(py)][int(px)] = cbase + cstep * point - rdep
                                                 #roadsMask[int(py)][int(px)] = 255
 
                                                 roadsMask[int(py)][int(px)] = 255
@@ -603,14 +639,26 @@ def hightmapBurnIn(bigtile):
     newim.save(name +'/rivers'+name+'.png')
     newim.close()
     '''
+    # 
+    #
+    roadsMask = cv2.dilate(roadsMask, (9,9), iterations=1)
+    roadsMask =  cv2.blur(roadsMask, (3,3))
+    #roadsMask = cv2.threshold(roadsMask, 128, 255, cv2.THRESH_BINARY)
 
-
-
+    for x in range(2041):
+        for y in range(2041):
+            if roadsMask[x][y]  < 128:
+                #print(structure[x][y])
+                #if altn[x][y] - float(structure[x][y]) *2 > 0:
+                altn[x][y] = altn[x][y] + (float(structure[x%256][y%256]) - 120)* 1.1
+                #else:
+                    #altn[x][y] = 0
                                            
-    roadsMask = cv2.blur(roadsMask, (2,2))
+    #
     cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)
 
     altn = cv2.blur(altn, (2,2))
+    #altm = cv2.blur(altm, (3,3))
     cv2.imwrite(name+'/hmap_burnIn_'+name+'.png', altn)
     cv2.imwrite(name+'/hmap_burnIn_noRiver_'+name+'.png', altm)
     #cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)
