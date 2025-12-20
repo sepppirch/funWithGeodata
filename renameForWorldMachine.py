@@ -7,14 +7,15 @@ names = []
 folders = ["forest","grass","hmaps","rocks"]
 prefix = ["f_","g_","h_","r_"]
 
-with open('tileselection.geojson', 'r') as file:
+with open('F_quarter.geojson', 'r') as file:
     data = json.load(file)
     for f in data["features"]:
         n = f["properties"]["name"].split("|")
-        names.append(n[1][1:])
+        names.append(n[0].replace(" ",""))
+        #print(n[0])
 
 #print(names)
-
+#print("------------------")
 bottomLeft = [16  ,-31]
 w = 18
 h = 18
@@ -28,8 +29,15 @@ for x in range (18):
         bigtile = (bottomLeft[1] + y + 18, bottomLeft[0] - x )
         
         name = str(bigtile[1])+"_"+str(bigtile[0])
-        print(name)
-        newname = "_X"+ str(y) +"_Y" + str(x)
+        
+        if name in names:
+            print(name)
+
+            
+            newname = "_X"+ str(y) +"_Y" + str(x)
+            src_path = name +'/hmap_burnIn_'+name+'.png'
+            destination_path = wpath +'/hmaps/h'+newname+'.png'
+            copy(src_path, destination_path)
         '''
         src_path = name +'/aerialways_'+name+'.json'
         destination_path = 'worldmachine/aerialways/aerialway_'+newname+'.json'
@@ -60,9 +68,7 @@ for x in range (18):
         destination_path = 'worldmachine/bridges/bridge'+newname+'.json'
         copy(src_path, destination_path)
         '''               
-        src_path = name +'/hmap_burnIn_'+name+'.png'
-        destination_path = wpath +'/hmaps/h'+newname+'.png'
-        copy(src_path, destination_path)
+
         '''
 
 
