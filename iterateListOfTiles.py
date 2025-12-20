@@ -77,12 +77,12 @@ for n in names:
         #makeLakes.makeRoadMesh(bigtile)
         #src_path = n +'/'+"building_s_"+n+'.obj'
         #destination_path = 'worldmachine_json/buildings_test/b_'+newnames[c]+'.obj'
-        #hightmapTiles.hightmapBurnIn(bigtile)
-        #makeLakes.makeRoadMesh(bigtile)
+        hightmapTiles.hightmapBurnIn(bigtile)
+        makeLakes.makeRoadMesh(bigtile)
         #makeLakes.makeRiverMesh(n)
         #print(n)
         #overpassQuery.cropGeoJsonPoly(bigtile,'geojson_src/A_trains.geojson','rail')
-        postprocessHmap.closegaps(bigtile)
+        #postprocessHmap.closegaps(bigtile)
         #rename(n,"hmap_burnIn",".png","h",'worldmachine_F/2041/hmap_burnIn_/')
         #rename(n,"rivers",".obj","river",'worldmachine_json/rivers/')
         #rename(n,"roads",".obj","rw",'worldmachine_json/roads/')

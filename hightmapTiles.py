@@ -261,7 +261,7 @@ def hightmapBurnIn(bigtile):
     
 
     lake = cv2.imread(name +'/lake'+name+'.png', cv2.IMREAD_UNCHANGED)
-    structure = cv2.imread('struct1.png', cv2.IMREAD_GRAYSCALE)
+    structure = cv2.imread('struct3.png', cv2.IMREAD_GRAYSCALE)
     print(structure.shape)
 
     kernel = np.ones((8, 8), np.uint8)
@@ -537,8 +537,11 @@ def hightmapBurnIn(bigtile):
     Roads3l = ["motorway_link","trunk","primary"]
     Roads2l = ["secondary","unclassified","tertiary","service","rail"]
 
-
-
+    upscale = 2
+    altb = cv2.resize(altb, (2041*upscale,2041*upscale), cv2.INTER_CUBIC)
+    altn = cv2.resize(altn, (2041*upscale,2041*upscale), cv2.INTER_CUBIC)
+    altm = cv2.resize(altm, (2041*upscale,2041*upscale), cv2.INTER_CUBIC)
+    roadsMask  = cv2.resize(roadsMask, (2041*upscale,2041*upscale), cv2.INTER_CUBIC)
 
     for i in data["features"]:
 
@@ -580,15 +583,15 @@ def hightmapBurnIn(bigtile):
 
             for j in range(len(i["geometry"]["coordinates"])-1): #["properties"]
 
-                thisP = np.array([i["geometry"]["coordinates"][j][0]  *2041, i["geometry"]["coordinates"][j][1]*2041])
-                nextP = np.array([i["geometry"]["coordinates"][j+1][0]  *2041, i["geometry"]["coordinates"][j+1][1]*2041])
+                thisP = np.array([i["geometry"]["coordinates"][j][0]  *2041*upscale, i["geometry"]["coordinates"][j][1]*2041*upscale])
+                nextP = np.array([i["geometry"]["coordinates"][j+1][0]  *2041*upscale, i["geometry"]["coordinates"][j+1][1]*2041*upscale])
                 l = np.linalg.norm(thisP - nextP)
                 #print(l)
                 step = np.subtract(nextP,thisP)/l/2
 
 
-                if thisP[0] < 2041 and thisP[0] > 0 and thisP[1] < 2041 and thisP[1] > 0 :
-                    if nextP[0] < 2041 and nextP[0] > 0 and nextP[1] < 2041 and nextP[1] > 0 :
+                if thisP[0] < 2041*upscale and thisP[0] > 0 and thisP[1] < 2041*upscale and thisP[1] > 0 :
+                    if nextP[0] < 2041*upscale and nextP[0] > 0 and nextP[1] < 2041*upscale and nextP[1] > 0 :
                         cbase =  altb[int(thisP[1])][int(thisP[0])]
                         cstep = (int(altb[int(nextP[1])][int(nextP[0])]) - int(altb[int(thisP[1])][int(thisP[0])]) ) /l/2
                 
@@ -596,31 +599,31 @@ def hightmapBurnIn(bigtile):
 
                             newPoint = thisP + step * point
 
-                            if newPoint[0] < 2041 and newPoint[0] > 0 and newPoint[1] < 2041 and newPoint[1] > 0 :
+                            if newPoint[0] < 2041*upscale and newPoint[0] > 0 and newPoint[1] < 2041*upscale and newPoint[1] > 0 :
                                 c = altb[int(newPoint[1])][int(newPoint[0])]
                     # neighboring pixels 
     
-
+                                '''
                                 if lanes == 1:
                                     altn[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point - rdep
                                     altm[int(newPoint[1])][int(newPoint[0])] = cbase + cstep * point- rdep
             #roadsMask[int(py)][int(px)] = 255
                                     roadsMask[int(newPoint[1])][int(newPoint[0])] = 255
                                 else:
+                                '''
+                                for u in range(lanes*upscale):
+                                    for v in range(lanes*upscale):
+                                        px = newPoint[0] + u - int(lanes*upscale/2) 
+                                        py = newPoint[1] + v - int(lanes*upscale/2) 
+                                        #print(str(x) +  "   "+str(y))
+                                        if px < 2041*upscale and px > 0 and py < 2041*upscale and py > 0 :
+                                                    
+                                            altn[int(py)][int(px)] = cbase + cstep * point - rdep
+                                            altm[int(py)][int(px)] = cbase + cstep * point - rdep
+                                            #roadsMask[int(py)][int(px)] = 255
 
-                                    for u in range(lanes):
-                                        for v in range(lanes):
-                                            px = newPoint[0] + u - int(lanes/2) 
-                                            py = newPoint[1] + v - int(lanes/2) 
-                                            #print(str(x) +  "   "+str(y))
-                                            if px < 2041 and px > 0 and py < 2041 and py > 0 :
-                                                        
-                                                altn[int(py)][int(px)] = cbase + cstep * point - rdep
-                                                altm[int(py)][int(px)] = cbase + cstep * point - rdep
-                                                #roadsMask[int(py)][int(px)] = 255
-
-                                                roadsMask[int(py)][int(px)] = 255
-                                
+                                            roadsMask[int(py)][int(px)] = 255
+                            
                                     
                                     
 
@@ -628,7 +631,7 @@ def hightmapBurnIn(bigtile):
 
             
 
-    #cv2.imwrite(name+'/hmap_burnIn_noRiver'+name+'.png', altn)
+    #
     #
 
 
@@ -660,20 +663,34 @@ def hightmapBurnIn(bigtile):
     roadsMask =  cv2.blur(roadsMask, (3,3))
     #roadsMask = cv2.threshold(roadsMask, 128, 255, cv2.THRESH_BINARY)
 
-    for x in range(2041):
-        for y in range(2041):
-            if roadsMask[x][y]  < 10:
-                #print(structure[x][y])
-                #if altn[x][y] - float(structure[x][y]) *2 > 0:
-                altn[x][y] = altn[x][y] + (float(structure[x%256][y%256]) - 120)* 1.1
+
+
+
+
+
+
                 #else:
                     #altn[x][y] = 0
                                            
     #
-    cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)
 
-    altn = cv2.blur(altn, (2,2))
+    
+    for x in range(2041*upscale):
+        for y in range(2041*upscale):
+            if roadsMask[x][y]  < 10:
+                #print(structure[x][y])
+                #if altn[x][y] - float(structure[x][y]) *2 > 0:
+                altn[x][y] = altn[x][y] + (float(structure[x%structure.shape[0]][y%structure.shape[0]]) - 120)* 1.1
+    #altn = cv2.blur(altn, (2,2))
     #altm = cv2.blur(altm, (3,3))
+
+
+    roadsMask = cv2.resize(roadsMask, (2041,2041), cv2.INTER_CUBIC)
+    cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)
+    altn = cv2.blur(altn, (3,3))
+    altn = cv2.resize(altn, (2041,2041), cv2.INTER_CUBIC)
+    altm = cv2.resize(altm, (2041,2041), cv2.INTER_CUBIC)
+    
     cv2.imwrite(name+'/hmap_burnIn_'+name+'.png', altn)
     cv2.imwrite(name+'/hmap_burnIn_noRiver_'+name+'.png', altm)
     #cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)
