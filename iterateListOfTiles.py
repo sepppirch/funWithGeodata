@@ -53,7 +53,7 @@ with open('F_quarter.geojson', 'r') as file:
 
 c = 0
 
-
+overpassQuery.cropGeoJsonPoly((3,-4),'alpsGeoJSON/alps_gletscher.geojson','gletscher')
 #hightmapTiles.hightmapBurnIn((1,-1))
 #makeLakes.makeRoadMesh((1,-1))
 #makeLakes.makeRiverMesh("1_-3")
@@ -77,8 +77,8 @@ for n in names:
         #makeLakes.makeRoadMesh(bigtile)
         #src_path = n +'/'+"building_s_"+n+'.obj'
         #destination_path = 'worldmachine_json/buildings_test/b_'+newnames[c]+'.obj'
-        hightmapTiles.hightmapBurnIn(bigtile)
-        makeLakes.makeRoadMesh(bigtile)
+        #hightmapTiles.hightmapBurnIn(bigtile)
+        #makeLakes.makeRoadMesh(bigtile)
         #makeLakes.makeRiverMesh(n)
         #print(n)
         #overpassQuery.cropGeoJsonPoly(bigtile,'geojson_src/A_trains.geojson','rail')
