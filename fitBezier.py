@@ -50,7 +50,7 @@ def fit_single_bezier_curve(points, max_control_dist=0.001, penalty_strength=1.0
     return P0, P1, P2, P3
 
 # Plot the Bézier curve and the points
-def plot_bezier_curve(points, P0, P1, P2, P3):
+def plot_bezier_curve(P0, P1, P2, P3):
     t = np.linspace(0, 1, 300)
     curve = np.array([bezier_curve(ti, P0, P1, P2, P3) for ti in t])
 
@@ -78,10 +78,10 @@ f = open(name+'/trains_'+name+'.json')
 data = json.load(f)
 i = 2
 points = np.array([[e[0], e[1]] for e in  data["coordinates"]]) 
-print(len(points))
+#print(len(points))
 newpoints = []
 # Fit Bézier spline to the 2D points (5 segments in this example)
-num_segments = int(len(points)/20)
+#num_segments = int(len(points)/20)
 
 
 
@@ -114,55 +114,69 @@ def findDirection(v1,v2):
 
     # Convert to degrees
     angle_deg = np.degrees(angle_rad)
-    print(angle_deg)
+    #print(angle_deg)
     return angle_deg
 
 
 
 groupedPoints = []
+
+subdPoints = []
 thisseg = []
 dist = 0
 thisdist = 0
 
-maxd = 1
-maxlen = 0.03
+maxd = 2
+maxlen = 0.01
 lastdir = 0.1
 turn = 0
 c = 0
 
+# find mean distance
+distances = []
 for i in range(len(points)-2):
     
     p0 = np.array(points[i])
     p1 = np.array(points[i+1])
     p2 = np.array(points[i+2])
     
-    thisdist = np.linalg.norm(points[i] - points[i+1])
-    dist = dist + thisdist
-    A = p1 - p0
-    B = p2 - p1
-    dir = findDirection(A,B)
-    turn = turn+abs(dir)
-    thisseg.append([points[i][0],points[i][1]])
+    thisdist = np.linalg.norm(points[i+2] - points[i+1])
+    distances.append(thisdist)
 
-   
-    if  turn > 30  or thisdist * dir/5 > maxd :#and len(thisseg)>2:#or thisdist > maxd:
-        lastdir = dir
-        #
-        
-        #if len(thisseg)>1:
-        thisseg.append([points[i+1][0],points[i+1][1]])
-            #groupedPoints.append(thisseg)
-        #else:
-            #x = [ [thisseg[0][0],thisseg[0][1]], [ (thisseg[0][0] + thisseg[len(thisseg)-1][0])/2 ,(thisseg[0][1] + thisseg[len(thisseg)-1][1])/2],  [ (thisseg[0][0] + thisseg[len(thisseg)-1][0])/2 ,(thisseg[0][1] + thisseg[len(thisseg)-1][1])/2],  [thisseg[len(thisseg)-1][0],thisseg[len(thisseg)-1][1]]  ]
-            
-            #print("reee")
-        #if len(thisseg)>3:
+mean_value = np.mean(distances)
+
+print(mean_value)
+
+for i in range(len(points)-2):
+    if i == 0:
+        thisseg.append([points[i][0],points[i][1]])
+    thisdist = np.linalg.norm(points[i+2] - points[i+1])
+
+    thisseg.append([points[i+1][0],points[i+1][1]])
+
+    if thisdist > mean_value*2.5 :
+
         groupedPoints.append(thisseg)
 
-        c = c + 1
+        
+        thisseg = []
+        thisseg.append([points[i+1][0],points[i+1][1]])
+        thisseg.append([points[i+2][0],points[i+2][1]])
+        groupedPoints.append(thisseg)
         thisseg = []
         turn = 0
         dist = 0
+        c = c + 1
+
+
+    if i == len(points)-3:
+        thisseg.append([points[i+2][0],points[i+2][1]])
+        groupedPoints.append(thisseg)
+
+
+
+        
+    
 
     '''
     thisdist = np.linalg.norm(points[i] - points[i+1])
@@ -194,20 +208,99 @@ for i in range(len(points)-2):
         #thisseg.append([points[i][0],points[i][1]])
         #break
     '''
-print(len(groupedPoints))
-for seg in groupedPoints:
+#print(len(groupedPoints))
+#for s in groupedPoints:
+
+finalPoints = []
+
+for i, s in enumerate(groupedPoints):
+
+
+    if len(s) == 1:
+        print(len(s))
+    elif len(s) == 2:
+        m = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2]
+        x = [s[0],m,m,s[1]]
+        #groupedPoints[i] = x
+        finalPoints.append(x)
+        #plot_bezier_curve(np.array(s[0]), np.array(s[1]), np.array(s[2]), np.array(s[3]))
     
 
+    elif len(s) ==3:
+        x = [s[0],s[1],s[1],s[2]]
+        #groupedPoints[i] = x
+        finalPoints.append(x)
+        #plot_bezier_curve(np.array(s[0]), np.array(s[1]), np.array(s[2]), np.array(s[3]))
+    elif len(s) == 4:
+        x = [s[0],s[1],s[2],s[3]]
+        finalPoints.append(x)
+    elif len(s) > 4:
+        turn = 0
+        splitseg = []
+        #finalPoints.append(s)
+
+        
+        for i in range(len(s)-1):
+            splitseg.append(s[i])
+
+            p0 = np.array(points[i])
+            p1 = np.array(points[i+1])
+            p2 = np.array(points[i+2])
+            thisdist = np.linalg.norm(points[i+2] - points[i+1])
+            A = p1 - p0
+            B = p2 - p1
+            dir = findDirection(A,B)
+            turn = turn + abs(dir * thisdist * 100)
+
+            if i == len(s)-2:
+                print("finish")
+                splitseg.append(s[len(s)-1])
+                finalPoints.append(splitseg)
+                turn = 0
+                splitseg = []
+
+            elif turn > 3:
+                finalPoints.append(splitseg)
+                turn = 0
+                splitseg = []
+                splitseg.append(s[i])
+             
 
 
-    newp = np.array(seg)
+
+for i, s in enumerate(finalPoints):
+
+
+    if len(s) == 1:
+        print(len(s))
+    elif len(s) == 2:
+        m = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2]
+        x = [s[0],m,m,s[1]]
+        finalPoints[i] = x
+    elif len(s) ==3:
+        x = [s[0],s[1],s[1],s[2]]
+        #groupedPoints[i] = x
+        finalPoints[i] = x
+        #plot_bezier_curve(np.array(s[0]), np.array(s[1]), np.array(s[2]), np.array(s[3]))
+    elif len(s) == 4:
+        x = [s[0],s[1],s[2],s[3]]
+        finalPoints[i] = x
 
 
 
 
-    P0, P1, P2, P3 = fit_single_bezier_curve(newp)
-        # Plot the result
-    plot_bezier_curve(points, P0, P1, P2, P3)
+
+for s in finalPoints:
+    #if len(s)>2:
+        print(len(s))
+
+        
+        newp = np.array(s)
+            
+        P0, P1, P2, P3 = fit_single_bezier_curve(newp)
+                # Plot the result
+        plot_bezier_curve(P0, P1, P2, P3)
+            #print(P0)
 
 
 
