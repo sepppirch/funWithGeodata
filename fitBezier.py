@@ -62,7 +62,7 @@ def plot_bezier_curve(P0, P1, P2, P3):
     control_x = [P0[0], P1[0], P2[0], P3[0]]
     control_y = [P0[1], P1[1], P2[1], P3[1]]
     
-    #plt.plot(control_x, control_y, 'k--', alpha=0.5, label="Control polygon")
+    plt.plot(control_x, control_y, 'k--', alpha=0.5, label="Control polygon")
 
 
 
@@ -77,7 +77,8 @@ import json
 f = open(name+'/trains_'+name+'.json')
 data = json.load(f)
 i = 2
-points = np.array([[e[0], e[1]] for e in  data["coordinates"]]) 
+points = np.array([[e[0], e[1]] for e in  data["coordinates"]])
+pointsC =  np.array([e[2] for e in  data["coordinates"]])
 #print(len(points))
 newpoints = []
 # Fit Bézier spline to the 2D points (5 segments in this example)
@@ -149,10 +150,10 @@ print(mean_value)
 
 for i in range(len(points)-2):
     if i == 0:
-        thisseg.append([points[i][0],points[i][1]])
+        thisseg.append([points[i][0], points[i][1], pointsC[i]])
     thisdist = np.linalg.norm(points[i+2] - points[i+1])
 
-    thisseg.append([points[i+1][0],points[i+1][1]])
+    thisseg.append([points[i+1][0], points[i+1][1], pointsC[i]])
 
     if thisdist > mean_value*2.5 :
 
@@ -160,8 +161,8 @@ for i in range(len(points)-2):
 
         
         thisseg = []
-        thisseg.append([points[i+1][0],points[i+1][1]])
-        thisseg.append([points[i+2][0],points[i+2][1]])
+        thisseg.append([points[i+1][0], points[i+1][1], pointsC[i+1]])
+        thisseg.append([points[i+2][0], points[i+2][1], pointsC[i+2]])
         groupedPoints.append(thisseg)
         thisseg = []
         turn = 0
@@ -170,46 +171,10 @@ for i in range(len(points)-2):
 
 
     if i == len(points)-3:
-        thisseg.append([points[i+2][0],points[i+2][1]])
+        thisseg.append([points[i+2][0],points[i+2][1], pointsC[i+2]])
         groupedPoints.append(thisseg)
 
 
-
-        
-    
-
-    '''
-    thisdist = np.linalg.norm(points[i] - points[i+1])
-    dist = dist + thisdist
-        
-    if  thisdist < maxd:
-        thisseg.append([points[i][0],points[i][1]])
-    else:
-        if len(thisseg) < 3:
-            
-            thisseg = [points[i],points[i],points[i+1],points[i+1]]
-        groupedPoints.append(thisseg)
-        #
-    
-             
-        if thisdist < 0.015:
-            
-            thisseg.append([points[i+1][0],points[i+1][1]])
-        if len(thisseg)>2:
-               
-        if len(thisseg) > 2:
-            groupedPoints.append([points[i],points[i],points[i+1],points[i+1]])
-        
-        #thisseg.append([points[i][0],points[i][1]])
-        #dist = 0
-
-        
-        #i = i-1
-        #thisseg.append([points[i][0],points[i][1]])
-        #break
-    '''
-#print(len(groupedPoints))
-#for s in groupedPoints:
 
 finalPoints = []
 
@@ -219,8 +184,9 @@ for i, s in enumerate(groupedPoints):
     if len(s) == 1:
         print(len(s))
     elif len(s) == 2:
-        m = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2]
-        x = [s[0],m,m,s[1]]
+        m1 = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2, s[0][2]]
+        m2 = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2, s[1][2]]
+        x = [s[0],m1,m2,s[1]]
         #groupedPoints[i] = x
         finalPoints.append(x)
         #plot_bezier_curve(np.array(s[0]), np.array(s[1]), np.array(s[2]), np.array(s[3]))
@@ -259,7 +225,7 @@ for i, s in enumerate(groupedPoints):
                 turn = 0
                 splitseg = []
 
-            elif turn > 3:
+            elif turn > 6:
                 finalPoints.append(splitseg)
                 turn = 0
                 splitseg = []
@@ -274,8 +240,9 @@ for i, s in enumerate(finalPoints):
     if len(s) == 1:
         print(len(s))
     elif len(s) == 2:
-        m = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2]
-        x = [s[0],m,m,s[1]]
+        m1 = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2, s[0][2]]
+        m2 = [(s[0][0]+s[1][0]) /2, (s[0][1]+s[1][1]) /2, s[1][2]]
+        x = [s[0],m1,m2,s[1]]
         finalPoints[i] = x
     elif len(s) ==3:
         x = [s[0],s[1],s[1],s[2]]
@@ -288,7 +255,9 @@ for i, s in enumerate(finalPoints):
 
 
 
-
+points = []
+Tin = [[finalPoints[0][0]]]
+Tout = []
 
 for s in finalPoints:
     #if len(s)>2:
@@ -296,14 +265,23 @@ for s in finalPoints:
 
         
         newp = np.array(s)
+        newp = np.delete(newp,(2), axis=1)
             
         P0, P1, P2, P3 = fit_single_bezier_curve(newp)
+
+        points.append([float(P0[0]), float(P0[1]), float(s[0][2])])   
+        Tin.append([float(P2[0]), float(P2[1]), float(s[len(s)-1][2])])
+        Tout.append([float(P1[0]), float(P1[1]), float(s[0][2])])
                 # Plot the result
         plot_bezier_curve(P0, P1, P2, P3)
             #print(P0)
 
+#print(finalPoints)
+thisbezier =json.dumps({"points":points , "Tin":Tin, "Tout":Tout})
+print(json.dumps(thisbezier))
 
-
+with open("F:/CLOUDBASE_git/Content/data/json/splines/bezier_X30_Y16.json", "w") as outfile:
+    outfile.write(thisbezier)
 
 plt.show()
 
