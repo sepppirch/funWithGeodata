@@ -32,7 +32,7 @@ def bezier_fit_error(params, points, max_control_dist, penalty_strength):
     return curve_error + penalty  # Total error with penalty
 
 # Fit a single Bézier curve to the points
-def fit_single_bezier_curve(points, max_control_dist=0.01, penalty_strength=1.0):
+def fit_single_bezier_curve(points, max_control_dist=0.01, penalty_strength=10.0):
     # Initial guess for control points (start, middle, and end)
     P0 = points[0]  # Start point
     P3 = points[-1]  # End point
@@ -226,7 +226,7 @@ for i, s in enumerate(groupedPoints):
                 turn = 0
                 splitseg = []
 
-            elif turn > 5:
+            elif turn > 6:
                 finalPoints.append(splitseg)
                 turn = 0
                 splitseg = []
@@ -265,7 +265,9 @@ for s in finalPoints:
             plot_bezier_curve(np.array(s[0]), np.array(s[1]), np.array(s[2]),np.array( s[3]))
             points.append([float(s[0][0]), float(s[0][1]), float(s[0][2])])   
             points.append([float(s[1][0]), float(s[1][1]), float(s[0][2])])
+            Tin.append([float(s[1][0]), float(s[1][1]), float(s[0][2])])
             points.append([float(s[2][0]), float(s[2][1]), float(s[len(s)-1][2])])
+            Tout.append([float(s[2][0]), float(s[2][1]), float(s[len(s)-1][2])])
         else:
 
             #print(len(s))
@@ -279,13 +281,31 @@ for s in finalPoints:
             points.append([float(P0[0]), float(P0[1]), float(s[0][2])])
             points.append([float(P1[0]), float(P1[1]), float(s[0][2])])
             points.append([float(P2[0]), float(P2[1]), float(s[len(s)-1][2])])
-            
+
+            Tin.append([float(P1[0]), float(P1[1]), float(s[0][2])])
+            Tout.append([float(P2[0]), float(P2[1]), float(s[len(s)-1][2])])
                     # Plot the result
             plot_bezier_curve(P0, P1, P2, P3)
             #print(P0)
 
 #print(finalPoints)
-thisbezier =json.dumps({"points":points})
+for i in range(int(len(points)/3)-1):
+
+    if i > 0:
+        p1 = np.array(points[i*3])
+        c2 = np.array(points[i*3-1])
+        c1 = np.array(points[i*3+1])
+        V1 =  c1- p1
+        V2 = p1 - c2
+        ang = findDirection(V1,V2)
+        if ang > 20:
+            nt = points[i*3+1]
+            points[i*3+1] = [nt[0],nt[1],nt[2]]
+
+
+
+
+thisbezier =json.dumps({"coordinates":points})
 #print(Tin)
 
 with open("F:/CLOUDBASE_git/Content/data/json/splines/bezier_X30_Y16.json", "w") as outfile:
