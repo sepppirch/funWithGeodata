@@ -31,9 +31,6 @@ def trafficPaths(prefix, name, fclass):
             selpaths["features"].append(thisfeature)
     
 
-    
-
-
     trains = findConnectedRoads.findJunctions(selpaths)
     #print(trains["features"][0])
     hmap = cv2.imread(name +'/hmap_burnIn_noRiver_'+name+'.png', cv2.IMREAD_UNCHANGED) #
@@ -117,8 +114,8 @@ def trafficPaths(prefix, name, fclass):
 
 
 
-def pathfromLine(name):
-    f = open(name+'/gletscher_'+name+'.json')
+def pathfromLine(prefix, name):
+    f = open(name+'/'+prefix+'_'+name+'.json')
     lines = json.load(f)
     f.close()
     
@@ -127,17 +124,27 @@ def pathfromLine(name):
     hmap = cv2.resize(hmap, (32656,32656), cv2.INTER_CUBIC)
 
     for f in lines["features"]:
-        for p in f["geometry"]["coordinates"]:
-            fcoords = [fix(p[1])*32656, fix(p[0])*32656]
-            c = float(hmap[int(fcoords[0])][int(fcoords[1])]*1.5625 - 51200)
-            p.append(c) 
+
+            for p in f["geometry"]["coordinates"]:
+                fcoords = [fix(p[1])*32656, fix(p[0])*32656]
+                c = float(hmap[int(fcoords[0])][int(fcoords[1])]*1.5625 - 51200)
+                p.append(c)
+
+
     print(lines)
 
-    with open(name +"/gletscher_"+name+".json",mode="w") as f:
+    with open(name +'/'+prefix+'_spline_'+name+".json",mode="w") as f:
         json.dump(lines,f)
 
-#pathfromLine('3_-4')
 
+
+
+
+
+
+
+
+'''
 
 r1 = ["motorway", "motorway_link"]
 r2 = ["primary","trunk","secondary"]
@@ -146,3 +153,6 @@ data = {"roads1":trafficPaths('roadssmooth','0_-1', r1), "roads2":trafficPaths('
 
 with open("F:/CLOUDBASE_git/Content/data/json/cars/cars_X30_y16.json",mode="w") as f:
     json.dump(data,f)
+'''    
+    
+pathfromLine("dam", '2_-4')
