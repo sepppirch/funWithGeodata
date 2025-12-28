@@ -53,7 +53,7 @@ with open('F_quarter.geojson', 'r') as file:
 
 c = 0
 
-overpassQuery.cropGeoJsonPoly((3,-4),'alpsGeoJSON/alps_gletscher.geojson','gletscher')
+
 #hightmapTiles.hightmapBurnIn((1,-1))
 #makeLakes.makeRoadMesh((1,-1))
 #makeLakes.makeRiverMesh("1_-3")
@@ -71,6 +71,7 @@ for n in names:
     #print(n)
     try:
         x = 1
+        overpassQuery.cropGeoJsonPoly(bigtile,'alpsGeoJSON/dams_F.geojson','dam')
         #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-selected-smooth.geojson','roadssmooth')
         #makeBuildingGeometry.filterBuildings(n)
         #makeBuildingGeometry.makeBuildings(n)
