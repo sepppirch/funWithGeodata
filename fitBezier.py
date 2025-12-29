@@ -149,14 +149,18 @@ mean_value = np.mean(distances)
 
 print(mean_value)
 
+
+
+
+
 for i in range(len(points)-2):
     if i == 0:
         thisseg.append([points[i][0], points[i][1], pointsC[i]])
-    thisdist = np.linalg.norm(points[i+2] - points[i+1])
+    thisdist = np.linalg.norm(points[i] - points[i+1])
 
     thisseg.append([points[i+1][0], points[i+1][1], pointsC[i]])
 
-    if thisdist > mean_value*10 :
+    if thisdist > mean_value*3 :
 
         groupedPoints.append(thisseg)
 
