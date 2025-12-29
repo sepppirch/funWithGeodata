@@ -195,7 +195,7 @@ for i in range(len(points)-2):
 
     thisseg.append([points[i+1][0], points[i+1][1], pointsC[i]])
 
-    if thisdist > mean_value*5 :
+    if thisdist > mean_value*3 :
 
         groupedPoints.append(thisseg)
 

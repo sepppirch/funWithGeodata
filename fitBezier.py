@@ -32,7 +32,7 @@ def bezier_fit_error(params, points, max_control_dist, penalty_strength):
     return curve_error + penalty  # Total error with penalty
 
 # Fit a single Bézier curve to the points
-def fit_single_bezier_curve(points, max_control_dist=0.01, penalty_strength=10.0):
+def fit_single_bezier_curve(points, max_control_dist=0.01, penalty_strength=1.0):
     # Initial guess for control points (start, middle, and end)
     P0 = points[0]  # Start point
     P3 = points[-1]  # End point
