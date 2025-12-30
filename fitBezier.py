@@ -155,7 +155,7 @@ for i in range(len(points)):
     newPoints.append([points[i][0], points[i][1], pointsC[i]])
     #print(distances[i]/mean_value)
     if i < len(points)-2:
-        iter = distances[i]/mean_value
+        iter = distances[i]/mean_value/2
 
         p0 = np.array([points[i][0], points[i][1], pointsC[i]])
         p1 = np.array([points[i+1][0], points[i+1][1], pointsC[i+1]])
@@ -262,7 +262,7 @@ for i in range(len(s)):
         A = p1 - p0
         B = p2 - p1
         dir = findDirection(A,B)
-        print(dir)
+        #print(dir)
         turn = turn + abs(dir)
         if i == len(s)-2:
             #print("finish")
@@ -324,8 +324,9 @@ for s in finalPoints:
             
         newp = np.array(s)
         newp = np.delete(newp,(2), axis=1)
-            
-        P0, P1, P2, P3 = fit_single_bezier_curve(newp)
+        dist = np.linalg.norm(np.array([s[0][0],s[0][1]]) - np.array([s[len(s)-1][0],s[len(s)-1][1]]))
+        print(dist)   
+        P0, P1, P2, P3 = fit_single_bezier_curve(newp, dist/15)
 
         #check tangent lengths
         
