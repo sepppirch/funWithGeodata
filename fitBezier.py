@@ -91,7 +91,7 @@ newpoints = []
 
 plt.figure(figsize=(8, 6))
 #print(points)
-plt.plot(points[:, 0], points[:, 1], "ro", markersize=2, label="Input points")
+#plt.plot(points[:, 0], points[:, 1], "ro", markersize=2, label="Input points")
 plt.xlabel("X")
 plt.ylabel("Y")
 plt.legend()
@@ -140,46 +140,79 @@ for i in range(len(points)-2):
     
     p0 = np.array(points[i])
     p1 = np.array(points[i+1])
-    p2 = np.array(points[i+2])
+    #p2 = np.array(points[i+2])
     
-    thisdist = np.linalg.norm(points[i+2] - points[i+1])
+    thisdist = np.linalg.norm(points[i] - points[i+1])
     distances.append(thisdist)
 
 mean_value = np.mean(distances)
 
 print(mean_value)
 
+newPoints = []
+
+for i in range(len(points)):
+    newPoints.append([points[i][0], points[i][1], pointsC[i]])
+    #print(distances[i]/mean_value)
+    if i < len(points)-2:
+        iter = distances[i]/mean_value
+
+        p0 = np.array([points[i][0], points[i][1], pointsC[i]])
+        p1 = np.array([points[i+1][0], points[i+1][1], pointsC[i+1]])
+        v = (p1 - p0)/iter
+        if (int(iter)) > 1:
+            for i in range(int(iter)):
+                p = p0 + v*(i+1)
+                newPoints.append([p[0], p[1], p[2]])
+    #else:
 
 
-
-
+plotpoints = np.array([[e[0], e[1]] for e in  newPoints])
+plt.plot(plotpoints[:, 0], plotpoints[:, 1], "ro", markersize=2, label="Input points")
+#plt.show()
+'''
 for i in range(len(points)-2):
-    if i == 0:
-        thisseg.append([points[i][0], points[i][1], pointsC[i]])
-    thisdist = np.linalg.norm(points[i] - points[i+1])
+    #thisseg.append([points[i][0], points[i][1], pointsC[i]])
+    thisseg.append([points[i][0], points[i][1], pointsC[i]])
 
-    thisseg.append([points[i+1][0], points[i+1][1], pointsC[i]])
 
-    if thisdist > mean_value*3 :
-
-        groupedPoints.append(thisseg)
+    if distances[i] > mean_value*6 :
+        
 
         
-        thisseg = []
-        thisseg.append([points[i+1][0], points[i+1][1], pointsC[i+1]])
-        thisseg.append([points[i+2][0], points[i+2][1], pointsC[i+2]])
+        
+        #thisseg.append([points[i][0], points[i][1], pointsC[i]])
         groupedPoints.append(thisseg)
         thisseg = []
-        turn = 0
-        dist = 0
-        c = c + 1
+        #i = i-1
+        #if distances[i] > mean_value*2 :
+        #print("reee")
+        nextseg = []
+        #nextseg.append([0.0, 0.0, 0.0])
+        nextseg.append([points[i][0], points[i][1], pointsC[i]])
+        nextseg.append([points[i+1][0], points[i+1][1], pointsC[i+1]])
+        groupedPoints.append(nextseg)
+        #print(thisseg)
+        thisseg = []
+        #else:
+        #thisseg.append([points[i][0], points[i][1], pointsC[i]])
+        
+    #else:    
 
 
-    if i == len(points)-3:
-        thisseg.append([points[i+2][0],points[i+2][1], pointsC[i+2]])
-        groupedPoints.append(thisseg)
+    #if i == len(points)-3:
+        #thisseg.append([points[i+2][0],points[i+2][1], pointsC[i+2]])
+groupedPoints.append(thisseg)
 
-
+for p in groupedPoints:
+    col = (np.random.random(), np.random.random(), np.random.random())
+    for i in range(len(p)-1):
+        p0 = [p[i][0], p[i+1][0]]
+        p1 = [p[i][1], p[i+1][1]]
+        #print(p0)
+        #plt.plot([s[i][0],s[i][1]], [s[i+1][0],s[i+1][1]], marker = 'o')
+        #plt.plot(p0, p1,  c=col)
+       
 
 finalPoints = []
 
@@ -202,42 +235,55 @@ for i, s in enumerate(groupedPoints):
         #groupedPoints[i] = x
         finalPoints.append(x)
         #plot_bezier_curve(np.array(s[0]), np.array(s[1]), np.array(s[2]), np.array(s[3]))
-    elif len(s) == 4:
-        x = [s[0],s[1],s[2],s[3]]
-        finalPoints.append(x)
-    elif len(s) > 4:
+    #elif len(s) == 4:
+        #x = [s[0],s[1],s[2],s[3]]
+        #finalPoints.append(x)
+    elif len(s) > 3:
         turn = 0
         splitseg = []
         #finalPoints.append(s)
+''' 
+s = newPoints 
+finalPoints = []
+splitseg = [] 
+d = 0
 
+
+
+for i in range(len(s)):
+    splitseg.append(s[i])
+    if i < len(s)-2:
+        p0 = np.array([s[i][0],s[i][1]])
+        p1 = np.array([s[i+1][0],s[i+1][1]])
+        p2 = np.array([s[i+2][0],s[i+2][1]])
+        thisdist = np.linalg.norm(p0 - p1)
+        d = d + thisdist
         
-        for i in range(len(s)-1):
+        A = p1 - p0
+        B = p2 - p1
+        dir = findDirection(A,B)
+        print(dir)
+        turn = turn + abs(dir)
+        if i == len(s)-2:
+            #print("finish")
+            #splitseg.append(s[len(s)-2])
+            #splitseg.append(s[len(s)-1])
+            finalPoints.append(splitseg)
+            turn = 0
+            splitseg = []
+            #print(d)
+        elif  turn > 30 or d > 0.02: #count %13 == 0 or
+            finalPoints.append(splitseg)
+            turn = 0
+            d = 0
+            splitseg = []
             splitseg.append(s[i])
 
-            p0 = np.array(points[i])
-            p1 = np.array(points[i+1])
-            p2 = np.array(points[i+2])
-            thisdist = np.linalg.norm(points[i+2] - points[i+1])
-            A = p1 - p0
-            B = p2 - p1
-            dir = findDirection(A,B)
-            turn = turn + abs(dir )
 
-            if i == len(s)-2:
-                #print("finish")
-                splitseg.append(s[len(s)-1])
-                finalPoints.append(splitseg)
-                turn = 0
-                splitseg = []
-
-            elif turn > 30:
-                finalPoints.append(splitseg)
-                turn = 0
-                splitseg = []
-                splitseg.append(s[i])
+finalPoints.append(splitseg)    
              
 
-
+'''
 
 for i, s in enumerate(finalPoints):
 
@@ -258,35 +304,48 @@ for i, s in enumerate(finalPoints):
         x = [s[0],s[1],s[2],s[3]]
         finalPoints[i] = x
 
-
+'''
 
 features = []
-Tin = []
-Tout = [[float(finalPoints[0][0][0]), float(finalPoints[0][0][1]),  float(finalPoints[0][0][2])]]
+#Tin = []
+#Tout = [[float(finalPoints[0][0][0]), float(finalPoints[0][0][1]),  float(finalPoints[0][0][2])]]
 
 for s in finalPoints:
-       
+        '''
         if len(s)== 4:
             plot_bezier_curve(np.array(s[0]), np.array(s[1]), np.array(s[2]),np.array( s[3]))
             features.append([float(s[0][0]), float(s[0][1]), float(s[0][2])])   
             features.append([float(s[1][0]), float(s[1][1]), float(s[0][2])])
             features.append([float(s[2][0]), float(s[2][1]), float(s[len(s)-1][2])])
         else:
-
+        '''
             #print(len(s))
 
             
-            newp = np.array(s)
-            newp = np.delete(newp,(2), axis=1)
-                
-            P0, P1, P2, P3 = fit_single_bezier_curve(newp)
-
-            features.append([float(P0[0]), float(P0[1]), float(s[0][2])])
-            features.append([float(P1[0]), float(P1[1]), float(s[0][2])])
-            features.append([float(P2[0]), float(P2[1]), float(s[len(s)-1][2])])
+        newp = np.array(s)
+        newp = np.delete(newp,(2), axis=1)
             
-                    # Plot the result
-            plot_bezier_curve(P0, P1, P2, P3)
+        P0, P1, P2, P3 = fit_single_bezier_curve(newp)
+
+        #check tangent lengths
+        
+        dist = np.linalg.norm(P0 - P3)
+        distC1 = np.linalg.norm(P0 - P1)
+        distC2 = np.linalg.norm(P2 - P3)
+
+        if distC1 > dist/1.5:
+            print("c1 too long")
+            P1 = P0 + (P1 - P0)/distC1*dist/1.5
+        if distC2 > dist/2:
+            print("c2 too long")
+            P2 = P3 + (P2 - P3)/distC2*dist/1.5
+        
+        features.append([float(P0[0]), float(P0[1]), float(s[0][2])])
+        features.append([float(P1[0]), float(P1[1]), float(s[0][2])])
+        features.append([float(P2[0]), float(P2[1]), float(s[len(s)-1][2])])
+        
+                # Plot the result
+        plot_bezier_curve(P0, P1, P2, P3)
             #print(P0)
         
 #print(finalPoints)
@@ -296,8 +355,8 @@ thisbezier =json.dumps({"points":[{"coordinates":features}]})
 with open("F:/CLOUDBASE_git/Content/data/json/splines/bezier_X30_Y16.json", "w") as outfile:
     outfile.write(thisbezier)
 
-newp = np.array(Tin + Tout)
-print(len(Tout))
-plt.plot(newp[:, 0], newp[:, 1], "o", color="blue", markersize=4, label="Input points")
+#newp = np.array(Tin + Tout)
+#print(len(Tout))
+#plt.plot(newp[:, 0], newp[:, 1], "o", color="blue", markersize=4, label="Input points")
 plt.show()
 
