@@ -97,7 +97,7 @@ def findJunctions(data):
             if len(x["geometry"]["coordinates"])>0:
                 othersFirst = x["geometry"]["coordinates"][0]
                 difnext = (last[0] - othersFirst[0]) + (last[1] - othersFirst[1])
-                print(difnext)
+                #print(difnext)
                 if difnext  == 0.0:
                     #print("next found" + str(count))
                     i["properties"]["nextSegments"].append(count)  

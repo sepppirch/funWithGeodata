@@ -11,13 +11,13 @@ import normalfromhightmap
 import cv2
 #import overpassQuery
 import landuse
-import masks
+#import masks
 #import segmentSatImage
 import numpy as np
 import thermalcalculator
 import overpassQuery
 import hightmapTiles
-
+#from motionpaths import trafficPaths , pathfromLine
 
 names = []
 newnames = []
@@ -68,16 +68,36 @@ x = 0
 for n in names:
     add = n.split("_")
     bigtile = (int(add[0]),int(add[1]))
-    #print(n)
+    print(n)
     try:
         x = 1
-        overpassQuery.cropGeoJsonPoly(bigtile,'alpsGeoJSON/dams_F.geojson','dam')
+        #overpassQuery.cropGeoJsonPoly(bigtile,'alpsGeoJSON/dams_F.geojson','dam')
+        #pathfromLine("dam", n)
+        '''
+        
+        r1 = ["motorway", "motorway_link"]
+        r2 = ["primary","trunk","secondary","tertiary","unclassified"]
+        r3 = ["rail"]
+        data = {"roads1":trafficPaths('roadssmooth',n,6, r1), "roads2":trafficPaths('roadssmooth',n,10, r2), "rail":trafficPaths('rail',n,5, r3)}
+
+        with open(n + "/cars_"+n+".json",mode="w") as f:
+            json.dump(data,f)
+        '''  
         #overpassQuery.cropGeoJsonPoly(bigtile,'austriaShapefiles/austria_roads-selected-smooth.geojson','roadssmooth')
         #makeBuildingGeometry.filterBuildings(n)
         #makeBuildingGeometry.makeBuildings(n)
         #makeLakes.makeRoadMesh(bigtile)
-        #src_path = n +'/'+"building_s_"+n+'.obj'
-        #destination_path = 'worldmachine_json/buildings_test/b_'+newnames[c]+'.obj'
+        '''
+        src_path = n +'/'+"cars_"+n+'.json'
+        destination_path = 'worldmachine_json/cars/cars_'+newnames[c]+'.json'
+        copyfiles(src_path,destination_path)
+        
+        src_path = n +'/'+"dam_spline_"+n+'.json'
+        destination_path = 'worldmachine_json/dam/dam_'+newnames[c]+'.json'
+        copyfiles(src_path,destination_path)
+        '''
+
+
         #hightmapTiles.hightmapBurnIn(bigtile)
         #makeLakes.makeRoadMesh(bigtile)
         #makeLakes.makeRiverMesh(n)
@@ -86,7 +106,7 @@ for n in names:
         #postprocessHmap.closegaps(bigtile)
         #rename(n,"hmap_burnIn",".png","h",'worldmachine_F/2041/hmap_burnIn_/')
         #rename(n,"rivers",".obj","river",'worldmachine_json/rivers/')
-        #rename(n,"roads",".obj","rw",'worldmachine_json/roads/')
+        rename(n,"roads",".obj","rw",'worldmachine_json/roads/')
         #rename(n,"Bridges",".json","bridge",'worldmachine_json/bridges/')
 
         #src_path = n +'/'+"roads_"+n+'.obj'
