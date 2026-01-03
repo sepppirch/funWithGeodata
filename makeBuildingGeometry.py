@@ -209,7 +209,7 @@ def makeBuildings(name):
                         # MAKE VERTS FOR FLAT ROOF
                         bevel = 10
                         
-
+                        '''
                         # INLINE BEVEL
                         for i in range (len(ring2)):
                             a = ring2[(i-1) % len(ring2)]
@@ -244,7 +244,7 @@ def makeBuildings(name):
                             tp1 = [p[0],p[1]]
                             workverts.append(tp) 
                             ring4.append(tp1)
-
+                        '''
                     elif ringcount == 4:
                         
                         A = ring2[0]
@@ -299,7 +299,7 @@ def makeBuildings(name):
                             rows = 1
                         
                             
-                        if random.randint(0,3)==0:
+                        if random.randint(0,5)==0:
                             woodhouse = True
                         else:
                             woodhouse = False
@@ -355,7 +355,8 @@ def makeBuildings(name):
 
                     # MAKE TRIANGLES FOR FLAT ROOOF
                     if ringcount > 4:
-
+                        xx = 1
+                        '''
                         ringNum = 1
 
                         uvt2 = [0,1,3]
@@ -382,26 +383,26 @@ def makeBuildings(name):
 
                             trianglesWall[randMat].append(t1)
                             trianglesWall[randMat].append(t2)
+                        '''
+                        ringNum = 1
 
-                        ringNum = 3
 
-
-
-                        roof = earclipping.clipEars(ring4)
+                        rrr = np.delete(ring2, 2, axis=1)
+                        roof = earclipping.clipEars(rrr)
                         if roof == False:
                             print("triangulation failed!!!")
                             print(polyRed)
                         else:
-                            for p in (ring4):
+                            for p in (ring2):
                                 workUVs.append([p[0]/1000, p[1]/1000])
                             
                             for i in roof:
                                     
-                                    #t = [i[0] + ringNum*ringcount + lengthVerts, 1, i[1]+ ringNum*ringcount +lengthVerts, 1, i[2] + + ringNum*ringcount+lengthVerts, 1]
+                                    t = [i[0] + ringNum*ringcount + lengthVerts, 1, i[1]+ ringNum*ringcount +lengthVerts, 1, i[2] + + ringNum*ringcount+lengthVerts, 1]
                                     #thisUV = lengthUV + ringcount * 4 + i[0]  
-                                    t = [i[0] + ringNum * ringcount + lengthVerts,  lengthUV + ringcount * 4 + i[0], i[1] + ringNum*ringcount +lengthVerts,  lengthUV + ringcount * 4 + i[1], i[2] + ringNum*ringcount+lengthVerts,  lengthUV + ringcount * 4 + i[2]] 
+                                    #t = [i[0] + ringNum * ringcount + lengthVerts,  lengthUV + ringcount * 4 + i[0], i[1] + ringNum*ringcount +lengthVerts,  lengthUV + ringcount * 4 + i[1], i[2] + ringNum*ringcount+lengthVerts,  lengthUV + ringcount * 4 + i[2]] 
                                     trianglesRoof[randMat].append(t)        
-                    
+                        
                     
                     
                     elif ringcount == 4:
