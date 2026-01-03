@@ -152,7 +152,7 @@ def makeLakesMesh(name):
                 newcountur.append([p[0]*size,p[1]*size])
                 #print(p)
 
-            z = hmap[int(p1[1]*2040)][int(p1[0]*2040)]*1.5625 - 51200
+            z = hmap[int(fix(p1[1])*2041)][int(fix(p1[0])*2041)]*1.5625 - 51200
             altis.append(z)
             print(z)
             contours.append(newcountur)
@@ -179,11 +179,11 @@ def makeLakesMesh(name):
             
             offset = len(verts)
             print("success")
-            ac+=1
-            print(ac)
+            
         except:
             print("Failed earclipping " + str(len(c)))
-        
+        ac+=1
+            #print(ac)
     open(name +'/lakes_'+name+'.obj', 'w').close()
     with open(name +'/lakes_'+name+'.obj', 'a') as f1:
         for v in verts:
@@ -734,7 +734,7 @@ def makeRoadMesh(bigtile):
                    # elif i == (len(s)-1):
                                                         # get Z coordinate from hightmap
                     #print(s)
-                    if s["bridge"] == 1:
+                    if s["bridge"] == 1 or s["tunnel"] == 1:
                         
                         bseg = len(s["geometry"]["coordinates"]) -1
                         c0 = hmap[int(s["geometry"]["coordinates"][0][1]*32656)][int(s["geometry"]["coordinates"][0][0]*32656)]*1.5625 - 51200

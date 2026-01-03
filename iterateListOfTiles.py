@@ -22,7 +22,7 @@ import hightmapTiles
 names = []
 newnames = []
 jsonfiles = [""]
-wpath = "worldmachine_json/thermalsGen"
+wpath = "worldmachine_F/2041"
 ### iterate all tiles in tileselection 
 #
 def copyfiles(src_path, destination_path):
@@ -55,8 +55,9 @@ c = 0
 
 
 #hightmapTiles.hightmapBurnIn((1,-1))
-#makeLakes.makeRoadMesh((1,-1))
+makeLakes.makeRoadMesh((1,-1))
 #makeLakes.makeRiverMesh("1_-3")
+#makeLakes.makeLakesMesh("-1_-2")
 
 def rename(n, oldname, suffix, newname, newpath):
     src_path = n +'/'+oldname+"_"+n+suffix
@@ -71,6 +72,10 @@ for n in names:
     print(n)
     try:
         x = 1
+        #src_path = n +'/'+"lakes_"+n+'.obj'
+        #destination_path = wpath+'/lakes_/lakes_'+newnames[c]+'.obj'
+        #copyfiles(src_path,destination_path)
+        #makeLakes.makeLakesMesh(n)
         #overpassQuery.cropGeoJsonPoly(bigtile,'alpsGeoJSON/dams_F.geojson','dam')
         #pathfromLine("dam", n)
         '''
@@ -106,7 +111,7 @@ for n in names:
         #postprocessHmap.closegaps(bigtile)
         #rename(n,"hmap_burnIn",".png","h",'worldmachine_F/2041/hmap_burnIn_/')
         #rename(n,"rivers",".obj","river",'worldmachine_json/rivers/')
-        rename(n,"roads",".obj","rw",'worldmachine_json/roads/')
+        #rename(n,"roads",".obj","rw",'worldmachine_json/roads/')
         #rename(n,"Bridges",".json","bridge",'worldmachine_json/bridges/')
 
         #src_path = n +'/'+"roads_"+n+'.obj'
@@ -168,9 +173,7 @@ for n in names:
     c += 1
     
     
-    src_path = n +'/'+"lakes_"+n+'.obj'
-    destination_path = wpath+'/lakes/lakes_'+newnames[c]+'.obj'
-    copyfiles(src_path,destination_path)
+    
 
     src_path = n +'/'+"thermals_"+n+'.json'
     destination_path = wpath+'/thermals/thermal_'+newnames[c]+'.json'
