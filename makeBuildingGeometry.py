@@ -44,11 +44,11 @@ def makeBuildings(name):
     #f1 = data["features"][0]
     verts = []
 
-    trianglesWall = [[],[],[],[],[],[],[],[],[],[]]
-    trianglesWindow = [[],[],[],[],[],[],[],[],[],[]]
-    trianglesDoor = [[],[],[],[],[],[],[],[],[],[]]
-    trianglesRoof = [[],[],[],[],[],[],[],[],[],[]]
-    randMat = 0
+    trianglesWall = [[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]]]
+    trianglesWindow = [[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]]]
+    trianglesDoor = [[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]]]
+    trianglesRoof = [[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]],[[0,1,2,0,1,2]]]
+    randMat = random.randint(1,9)
 
     ##print(len(data["features"]))
     UVs = [[0.0,0.0],[0.0,1],[1,1],[1,0],[2,0.5]]
@@ -282,7 +282,10 @@ def makeBuildings(name):
                         workverts.append(G8)
                     #else:
                         ##print("less then 4 points")
-                        woodhouse = False
+                        if random.randint(0,5)==0:
+                            woodhouse = True
+                        else:
+                            woodhouse = False
 
                     for i in range(ringcount):
                         # get length of segment for UVS
@@ -299,10 +302,7 @@ def makeBuildings(name):
                             rows = 1
                         
                             
-                        if random.randint(0,5)==0:
-                            woodhouse = True
-                        else:
-                            woodhouse = False
+
                         #print(str(rows))
                     if woodhouse: 
                         randMat = 0
