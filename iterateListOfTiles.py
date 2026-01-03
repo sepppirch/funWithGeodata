@@ -53,11 +53,13 @@ with open('F_quarter.geojson', 'r') as file:
 
 c = 0
 
-
+makeBuildingGeometry.makeBuildings("1_-1")
 #hightmapTiles.hightmapBurnIn((1,-1))
-makeLakes.makeRoadMesh((1,-1))
+#makeLakes.makeRoadMesh((1,-1))
 #makeLakes.makeRiverMesh("1_-3")
 #makeLakes.makeLakesMesh("-1_-2")
+
+
 
 def rename(n, oldname, suffix, newname, newpath):
     src_path = n +'/'+oldname+"_"+n+suffix
@@ -72,6 +74,11 @@ for n in names:
     print(n)
     try:
         x = 1
+        #makeBuildingGeometry.makeBuildings(n)
+        #src_path = n +'/'+"building_s_"+n+'.obj'
+        #destination_path = wpath+'/building_/b_'+newnames[c]+'.obj'
+        #copyfiles(src_path,destination_path)
+        #
         #src_path = n +'/'+"lakes_"+n+'.obj'
         #destination_path = wpath+'/lakes_/lakes_'+newnames[c]+'.obj'
         #copyfiles(src_path,destination_path)
@@ -167,9 +174,7 @@ for n in names:
     cv2.imwrite(n +'/'+"hmap_burnIn_quarter_"+n+'.png', half)
     
    
-    src_path = n +'/'+"building_s_"+n+'.obj'
-    destination_path = wpath+'/building/b_'+newnames[c]+'.obj'
-    copyfiles(src_path,destination_path)
+
     c += 1
     
     

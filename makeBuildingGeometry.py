@@ -44,10 +44,10 @@ def makeBuildings(name):
     #f1 = data["features"][0]
     verts = []
 
-    trianglesWall = [[],[],[],[],[]]
-    trianglesWindow = [[],[],[],[],[]]
-    trianglesDoor = [[],[],[],[],[]]
-    trianglesRoof = [[],[],[],[],[]]
+    trianglesWall = [[],[],[],[],[],[],[],[],[],[]]
+    trianglesWindow = [[],[],[],[],[],[],[],[],[],[]]
+    trianglesDoor = [[],[],[],[],[],[],[],[],[],[]]
+    trianglesRoof = [[],[],[],[],[],[],[],[],[],[]]
     randMat = 0
 
     ##print(len(data["features"]))
@@ -169,9 +169,9 @@ def makeBuildings(name):
                 polyRed.insert(0,lastP)
                 polyRed.pop()
                 #print(polyRed)
-            randMat = random.randint(1,2)
+            randMat = random.randint(1,5)
         else:
-            randMat = random.randint(3,4)
+            randMat = random.randint(6,9)
 
 
 
@@ -207,7 +207,7 @@ def makeBuildings(name):
 
                     if ringcount > 4:
                         # MAKE VERTS FOR FLAT ROOF
-                        bevel = 5
+                        bevel = 10
                         
 
                         # INLINE BEVEL
@@ -255,8 +255,12 @@ def makeBuildings(name):
                         AD = np.subtract(D, A)
                         BC = np.subtract(C, B)
                         AB = np.subtract(A, B)
+                        
                         ABn = AB/ np.linalg.norm(AB) *30
-                        roofangle = random.randint(2,4) 
+                        if np.linalg.norm(AB) > 1000:
+                            roofangle = 10
+                        else:
+                            roofangle = random.randint(2,4)
                         G1 = A + AD/2 + [0,0,np.linalg.norm(AD)/roofangle]
                         G2 = B + BC/2 + [0,0,np.linalg.norm(BC)/roofangle]
                         G3 = G1 + ABn
@@ -278,7 +282,7 @@ def makeBuildings(name):
                         workverts.append(G8)
                     #else:
                         ##print("less then 4 points")
-                        woodhouse = True
+                        woodhouse = False
 
                     for i in range(ringcount):
                         # get length of segment for UVS
@@ -293,7 +297,11 @@ def makeBuildings(name):
                             rows = int(lenAB)
                         else: 
                             rows = 1
-                        if rows % 2 == 1:
+                        
+                            
+                        if random.randint(0,3)==0:
+                            woodhouse = True
+                        else:
                             woodhouse = False
                         #print(str(rows))
                     if woodhouse: 
