@@ -38,6 +38,18 @@ for x in range (18):
             src_path = name +'/hmap_burnIn_'+name+'.png'
             destination_path = wpath +'/hmaps/h'+newname+'.png'
             copy(src_path, destination_path)
+
+            src_path = name +'/forest'+name+'.png'
+            destination_path = wpath+'/forest/f'+newname+'.png'
+            copy(src_path, destination_path)
+
+            src_path = name +'/ice'+name+'.png'
+            destination_path = wpath+'/ice/i'+newname+'.png'
+            copy(src_path, destination_path)
+
+            src_path = name +'/grass'+name+'.png'
+            destination_path = wpath+'/grass/g'+newname+'.png'
+            copy(src_path, destination_path)
         '''
         src_path = name +'/aerialways_'+name+'.json'
         destination_path = 'worldmachine/aerialways/aerialway_'+newname+'.json'
@@ -74,17 +86,7 @@ for x in range (18):
 
 
        
-        src_path = name +'/forestn'+name+'.png'
-        destination_path = wpath+'/forest/f'+newname+'.png'
-        copy(src_path, destination_path)
 
-        src_path = name +'/rocksn'+name+'.png'
-        destination_path = wpath+'/rocks/r'+newname+'.png'
-        copy(src_path, destination_path)
-
-        src_path = name +'/grassn'+name+'.png'
-        destination_path = wpath+'/grass/g'+newname+'.png'
-        copy(src_path, destination_path)
         
 
         

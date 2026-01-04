@@ -621,8 +621,8 @@ def hightmapBurnIn(bigtile):
                                             altn[int(py)][int(px)] = cbase + cstep * point - rdep
                                             altm[int(py)][int(px)] = cbase + cstep * point - rdep
                                             #roadsMask[int(py)][int(px)] = 255
-
-                                            roadsMask[int(py)][int(px)] = 255
+                                            if u > 0 and v > 0 and u < lanes*upscale-1 and v < lanes*upscale-1:
+                                                roadsMask[int(py)][int(px)] = 255
                             
                                     
                                     
@@ -659,7 +659,7 @@ def hightmapBurnIn(bigtile):
     '''
     # 
     #
-    roadsMask = cv2.dilate(roadsMask, (9,9), iterations=1)
+    #roadsMask = cv2.dilate(roadsMask, (9,9), iterations=1)
     roadsMask =  cv2.blur(roadsMask, (3,3))
     #roadsMask = cv2.threshold(roadsMask, 128, 255, cv2.THRESH_BINARY)
 

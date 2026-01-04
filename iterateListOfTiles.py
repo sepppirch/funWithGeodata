@@ -54,12 +54,12 @@ with open('F_quarter.geojson', 'r') as file:
 c = 0
 
 
-#hightmapTiles.hightmapBurnIn((1,-1))
+
 #makeBuildingGeometry.makeBuildings('1_-1')
 #makeLakes.makeRoadMesh((1,-1))
 #makeLakes.makeRiverMesh("1_-3")
 #makeLakes.makeLakesMesh("-1_-2")
-
+#landuse.makeMasksfromLanduse((1,-3))
 
 
 def rename(n, oldname, suffix, newname, newpath):
@@ -74,11 +74,13 @@ for n in names:
     bigtile = (int(add[0]),int(add[1]))
     print(n)
     try:
+        #hightmapTiles.hightmapBurnIn(bigtile)
+        landuse.makeMasksfromLanduse(bigtile)
         x = 1
         #makeBuildingGeometry.makeBuildings(n)
-        src_path = n +'/'+"building_s_"+n+'.obj'
-        destination_path = wpath+'/building_/b_'+newnames[c]+'.obj'
-        copyfiles(src_path,destination_path)
+        #src_path = n +'/'+"building_s_"+n+'.obj'
+        #destination_path = wpath+'/building_/b_'+newnames[c]+'.obj'
+        #copyfiles(src_path,destination_path)
         #
         #src_path = n +'/'+"lakes_"+n+'.obj'
         #destination_path = wpath+'/lakes_/lakes_'+newnames[c]+'.obj'
@@ -139,7 +141,7 @@ for n in names:
     #segmentSatImage.segment(n)
     
     #
-    #landuse.makeMasksfromLanduse(bigtile)
+    
     
     src_path = n +'/'+"roads_"+n+'.obj'
     destination_path = 'worldmachine_json/newroads/rw_'+newnames[c]+'.obj'

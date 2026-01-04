@@ -117,7 +117,7 @@ def makeMasksfromLanduse(bigtile):
             if color not in allcolors:
                 allcolors.append(color)
             # hmd[i] < (17000 + (nmd[i]-140) * 60) -- randomize treeline to avoid a straight line
-            if  (color == 5 or color == 7 or color == 11 or gmd[i] > 128) and rmdata[i] < 2 and nmd[i] > 155 and imd[i] < 20 and hmd[i] < (17000 + (nmd[i]-140) * 60):
+            if  ((color == 5 or color == 7 or color == 11 or gmd[i] > 128) and rmdata[i] < 2 and nmd[i] > 155 and imd[i] < 20 and hmd[i] < (17000 + (nmd[i]-140) * 60)) or (color == 2 and fmd[i] > 10 and rmdata[i] < 200):
                 newimdata.append(255)
             else:
                 newimdata.append(0)

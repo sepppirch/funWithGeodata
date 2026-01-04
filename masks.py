@@ -5,9 +5,9 @@ import cv2
 from datetime import datetime
 import math
 #from image_downloading import download_image
-from geotiff import GeoTiff
+#from geotiff import GeoTiff
 import numpy as np
-from PIL import Image, ImageFilter
+#from PIL import Image, ImageFilter
 
 
 
@@ -119,16 +119,26 @@ def drawLinesRoads(bigtile):
     cv2.imwrite(name+'/rmask'+name+'.png', roadsMask)
 
 
-bigtile = (1,-3)
+bigtile = (1,-1)
 
 #cv2.imwrite(name+'/teeeeest'+name+'.png', drawLines(2, bigtile, "aerialways_", Mask))
-roadsmask =  drawLinesRoads(bigtile)
+#roadsmask =  drawLinesRoads(bigtile)
 
 '''
-Mask = np.zeros( (2041,2041,1), dtype=np.uint8)
+
 riversmask = drawLines(10, bigtile, "rivers_", Mask)
 areal = drawLines(6, bigtile, "aerialways_", riversmask)
 powerlines = drawLines(5, bigtile, "power_", areal)
 buildings = drawLines(5, bigtile, "buildings_", powerlines)
 cv2.imwrite(name+'/fmask'+name+'.png', buildings)
-'''
+
+
+Mask = np.zeros( (2041,2041,1), dtype=np.uint8)
+areal = drawLines(6, bigtile, "aerialways_", Mask)
+powerlines = drawLines(5, bigtile, "power_", areal)
+
+cv2.imshow("ree",powerlines)
+cv2.waitKey(0)
+
+# closing all open windows
+cv2.destroyAllWindows()'''
