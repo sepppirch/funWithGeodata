@@ -17,12 +17,14 @@ import numpy as np
 import thermalcalculator
 import overpassQuery
 import hightmapTiles
+import masks
 #from motionpaths import trafficPaths , pathfromLine
 
 names = []
 newnames = []
 jsonfiles = [""]
-wpath = "worldmachine_F/2041"
+#wpath = "worldmachine_F/2041" #worldmachine_json\buildings_test
+wpath = "worldmachine_json/buildings_test"
 ### iterate all tiles in tileselection 
 #
 def copyfiles(src_path, destination_path):
@@ -55,7 +57,7 @@ c = 0
 
 
 
-#makeBuildingGeometry.makeBuildings('1_-1')
+#makeBuildingGeometry.makeBuildings('0_1')
 #makeLakes.makeRoadMesh((1,-1))
 #makeLakes.makeRiverMesh("1_-3")
 #makeLakes.makeLakesMesh("-1_-2")
@@ -75,12 +77,16 @@ for n in names:
     print(n)
     try:
         #hightmapTiles.hightmapBurnIn(bigtile)
-        landuse.makeMasksfromLanduse(bigtile)
-        x = 1
-        #makeBuildingGeometry.makeBuildings(n)
-        #src_path = n +'/'+"building_s_"+n+'.obj'
-        #destination_path = wpath+'/building_/b_'+newnames[c]+'.obj'
+        #landuse.makeMasksfromLanduse(bigtile)
+        #masks.combineNmapCollisionmap(bigtile)
+        #src_path = n +'/'+"nmap_smallc_"+n+'.png'
+        #destination_path = wpath+'/nmap_small_/n_'+newnames[c]+'.png'
         #copyfiles(src_path,destination_path)
+        x = 1
+        makeBuildingGeometry.makeBuildings(n)
+        src_path = n +'/'+"building_"+n+'.obj'
+        destination_path = wpath+'/b_'+newnames[c]+'.obj'
+        copyfiles(src_path,destination_path)
         #
         #src_path = n +'/'+"lakes_"+n+'.obj'
         #destination_path = wpath+'/lakes_/lakes_'+newnames[c]+'.obj'

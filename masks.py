@@ -14,7 +14,7 @@ def combineNmapCollisionmap(bigtile):
 
     name = str(bigtile[0])+"_"+str(bigtile[1])
     src = cv2.imread(name+ '/nmap_small_'+ name +".png",1)
-    mask = cv2.imread(name+ '/forest'+ name +".png", 0)
+    mask = cv2.imread(name+ '/colMask_'+ name +".png", 0)
     mask = cv2.resize(mask,(256,256))
     #tmp = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
     #_,alpha = cv2.threshold(tmp,0,255,cv2.THRESH_BINARY)
@@ -23,7 +23,7 @@ def combineNmapCollisionmap(bigtile):
     rgba = [b,g,r, mask]
     dst = cv2.merge(rgba,4)
 
-    cv2.imwrite("test.png", dst)
+    cv2.imwrite(name+ '/nmap_smallc_'+ name +".png", dst)
 
 
 

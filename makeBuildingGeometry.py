@@ -37,7 +37,7 @@ def makeBuildings(name):
 
     ###print(hmap[0][0])
 
-    f = open(name+'/buildings_reduced_'+name+'.json')
+    f = open(name+'/buildings_'+name+'.json')
     data = json.load(f)
 
 
@@ -52,10 +52,11 @@ def makeBuildings(name):
 
     ##print(len(data["features"]))
     UVs = [[0.0,0.0],[0.0,1],[1,1],[1,0],[2,0.5]]
-
+    collisionMask = cv2.imread(name +'/forestn'+name+'.png', cv2.IMREAD_UNCHANGED)#np.zeros( (2041,2041,1), dtype=np.uint8 )
     for sample in range (len(data["features"])-1):#data["features"]:
     #for sample in range (1000):
     #if len(data["features"][x]["geometry"]["coordinates"]) > 0:
+        
         lengthVerts = len(verts)
         lengthUV = len(UVs)
         poly = []
@@ -68,11 +69,12 @@ def makeBuildings(name):
         buildingHeight = 0
         circumference = 0        
         woodhouse = False
+        wsize = 150
         #poly = varray[sample]   
         
         if "height" in data["features"][sample]["properties"]:
             try:
-                buildingHeight = int(float(data["features"][sample]["properties"]["height"].replace("m", "").replace(",", ".")) / 3)*100
+                buildingHeight = int(float(data["features"][sample]["properties"]["height"].replace("m", "").replace(",", ".")) / 3)*wsize
             except:
                 buildingHeight = 0
             if buildingHeight > 2000:
@@ -150,13 +152,32 @@ def makeBuildings(name):
         #else:
             ##print("clockwise")
         #print(buildingHeight)
+        anglecheck = True
         if buildingHeight == 0:
-            #print(circumference)
-            buildingHeight = int(circumference*40000)+ 1 * 75
+            #print(circumference*20000)
+            if circumference*20000 < 500:
+                buildingHeight = int(circumference*20000)+ 1 * wsize
+            else:
+                buildingHeight = random.randint(1,3) * wsize
             
-            if buildingHeight > 400:
-                buildingHeight = random.randint(2,3) * 100
-        #print(circumference)
+            if len(polyRed) == 4:
+
+                AB = np.subtract(polyRed[1], polyRed[0])
+                BC = np.subtract(polyRed[1], polyRed[2])
+                CD = np.subtract(polyRed[3], polyRed[2])
+                DA = np.subtract(polyRed[3], polyRed[0])
+
+                angle1 = np.arctan2(BC[1], BC[0]) - np.arctan2(AB[1], AB[0])
+                angle2 = np.arctan2(CD[1], CD[0]) - np.arctan2(DA[1], DA[0])
+                paralell = (np.linalg.norm(AB) - np.linalg.norm(CD)) + (np.linalg.norm(BC) - np.linalg.norm(DA))
+                #print(str(abs(90 - (np.rad2deg(angle1)%180))) +"   " +str(abs(90 - (np.rad2deg(angle2)%180))))
+
+                if abs(90 - (np.rad2deg(angle1)%180)) > 10 and abs(90 - (np.rad2deg(angle1)%180)) > 10:
+                    polyRed = []
+                asp = np.linalg.norm(AB)/np.linalg.norm(bc)
+                if asp < 0.3 or asp > 3:
+                    buildingHeight = 1 * wsize
+        #
 
         # Resort for Saddle ROOF
         if len(polyRed) == 4:
@@ -169,7 +190,12 @@ def makeBuildings(name):
                 polyRed.insert(0,lastP)
                 polyRed.pop()
                 #print(polyRed)
-            randMat = random.randint(1,5)
+            if int(circumference*20000) < 45:
+                woodhouse = True
+            elif int(circumference*20000) > 400:
+                woodhouse = True
+            else:
+                randMat = random.randint(0,5)
         else:
             randMat = random.randint(6,9)
 
@@ -179,19 +205,36 @@ def makeBuildings(name):
         #p1 = np.array([data["features"][sample]["geometry"]["coordinates"][0][0] , data["features"][sample]["geometry"]["coordinates"][0][1]])
         if len(polyRed) > 3:
             p1 = polyRed[0]
-            if p1[0] < 1 and p1[0] > 0 and p1[1] < 1 and p1[1] > 0 : 
+            if p1[0] < 1 and p1[0] > 0 and p1[1] < 1 and p1[1] > 0 :
                     
+                    parray = []
+                    for j in range(len(polyRed)): #["properties"]
+                        parray.append([polyRed[j][0]  *2041, polyRed[j][1]*2041])
+
+                    pts = np.array(parray,np.int32)
+                    pts = pts.reshape((-1, 1, 2))
+                    color = max(0, min(buildingHeight/2, 255))
+                    collisionMask = cv2.fillPoly(collisionMask, [pts],color)
+                    #collisionMask = cv2.polylines(collisionMask, [pts], True, color, 2)
                 #if p1[0] <= 1 and p1[0] >= 0 and p1[1] <= 1 and p1[1] >= 0 :
 
                     # get Z coordinate from hightmap
                     c = hmap[int(p1[1]*2041)][int(p1[0]*2041)]*1.5625 - 51200
+
+                    #searchlowest c
+                    c = 9999999.99
+                    for p1 in polyRed:
+                        if p1[0] < 1 and p1[0] > 0 and p1[1] < 1 and p1[1] > 0 :
+                            if (hmap[int(p1[1]*2041)][int(p1[0]*2041)]*1.5625 - 51200) < c:
+                                c = (hmap[int(p1[1]*2041)][int(p1[0]*2041)]*1.5625 - 51200)
+
                     #if c > hightest:
                     #    hightest = c
                     #if c < -26000:
                     #c = 0.0
                     for p in polyRed:
                         #x = [(p[0]-p1[0])*size , (p[1]-p1[1])*size , c]
-                        x = [p[0]*size , p[1]*size , c]
+                        x = [p[0]*size , p[1]*size , c ]
                         workverts.append(x)
                     ringcount = len(polyRed)
                     ##print(count)
@@ -255,12 +298,17 @@ def makeBuildings(name):
                         AD = np.subtract(D, A)
                         BC = np.subtract(C, B)
                         AB = np.subtract(A, B)
+
                         
-                        ABn = AB/ np.linalg.norm(AB) *30
+
+                        if np.linalg.norm(AB) > 500:
+                            ABn = AB/ np.linalg.norm(AB) *10
+                        else:
+                            ABn = AB/20
                         if np.linalg.norm(AB) > 1000:
                             roofangle = 10
                         else:
-                            roofangle = random.randint(2,4)
+                            roofangle = random.randint(4,7)
                         G1 = A + AD/2 + [0,0,np.linalg.norm(AD)/roofangle]
                         G2 = B + BC/2 + [0,0,np.linalg.norm(BC)/roofangle]
                         G3 = G1 + ABn
@@ -282,10 +330,10 @@ def makeBuildings(name):
                         workverts.append(G8)
                     #else:
                         ##print("less then 4 points")
-                        if random.randint(0,5)==0:
-                            woodhouse = True
-                        else:
-                            woodhouse = False
+                        #if random.randint(0,5)==0:
+                            #woodhouse = True
+                        #else:
+                            #woodhouse = False
 
                     for i in range(ringcount):
                         # get length of segment for UVS
@@ -297,9 +345,9 @@ def makeBuildings(name):
                         ba = np.subtract(b, a)
                         lenAB= np.linalg.norm(ba)/100
                         if lenAB > 1:
-                            rows = int(lenAB)
+                            rows = int(lenAB)+1
                         else: 
-                            rows = 1
+                            rows = 2
                         
                             
 
@@ -315,11 +363,11 @@ def makeBuildings(name):
                         # get length of segment for UVS
                         
                         rows = 2
-                        col = int(buildingHeight/100)
+                        col = int(buildingHeight/wsize)+1
                         a = workverts[i]
                         b = workverts[(i+1)%ringcount]
                         ba = np.subtract(b, a)
-                        lenAB= np.linalg.norm(ba)/100
+                        lenAB= np.linalg.norm(ba)/ wsize
                         if lenAB > 1:
                             rows = int(lenAB)
                         else: 
@@ -450,8 +498,9 @@ def makeBuildings(name):
                     #print("p0 out of range") 
                     #print(polyRed)  
     print(hightest)
-    open(name +'/building_s_'+name+'.obj', 'w').close()
-    with open(name +'/building_s_'+name+'.obj', 'a') as f1:
+    cv2.imwrite(name+'/colMask_'+name+'.png', collisionMask)
+    open(name +'/building_'+name+'.obj', 'w').close()
+    with open(name +'/building_'+name+'.obj', 'a') as f1:
         for v in verts:
             line = "v " + str(v[0]) + " " + str(v[1]) + " " + str(v[2]) + '\n'
             f1.write(line)
