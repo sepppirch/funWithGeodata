@@ -26,7 +26,7 @@ def makeSatMap(bigtile):
     name = str(bigtile[0])+"_"+str(bigtile[1])
     area_box = [(topLeft[0],topLeft[1]), (topLeft[0]+w,topLeft[1]-h)]
 
-    tiff_file = "sentinel/alps_E_c.tif"
+    tiff_file = "sentinel/alps_WW_c.tif"
     
     #tiff_file = "DEM/DEM_NO_austria.tif"
     #tiff_file = "DEM/alps_4258conv.tif"

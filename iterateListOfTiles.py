@@ -45,7 +45,7 @@ def copyfiles(src_path, destination_path):
 
 
 # 'F.geojson'
-with open('F_quarter.geojson', 'r') as file:
+with open('tileselectionWW.geojson', 'r') as file:
     data = json.load(file)
     for f in data["features"]:
         n = f["properties"]["name"].split("|")
@@ -91,12 +91,12 @@ for n in names:
         src_path = n +'/'+"building_"+n+'.obj'
         destination_path = wpath+'/b_'+newnames[c]+'.obj'
         copyfiles(src_path,destination_path)
-        '''
+        
 
         src_path = n +'/'+"sentSat_"+n+'.png'
         destination_path = wpath+'/sat/sat_'+newnames[c]+'.png'
         copyfiles(src_path,destination_path)
-        
+        '''
         #
         #src_path = n +'/'+"lakes_"+n+'.obj'
         #destination_path = wpath+'/lakes_/lakes_'+newnames[c]+'.obj'
