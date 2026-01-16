@@ -9,6 +9,7 @@ import makeBuildingGeometry
 import makeLandscapeMesh
 import normalfromhightmap
 import cv2
+import downloadSatImage
 #import overpassQuery
 import landuse
 #import masks
@@ -23,8 +24,8 @@ import masks
 names = []
 newnames = []
 jsonfiles = [""]
-#wpath = "worldmachine_F/2041" #worldmachine_json\buildings_test
-wpath = "worldmachine_json/buildings_test"
+wpath = "worldmachine_F/2041" #worldmachine_json\buildings_test
+#wpath = "worldmachine_json/buildings_test"
 ### iterate all tiles in tileselection 
 #
 def copyfiles(src_path, destination_path):
@@ -83,10 +84,19 @@ for n in names:
         #destination_path = wpath+'/nmap_small_/n_'+newnames[c]+'.png'
         #copyfiles(src_path,destination_path)
         x = 1
+        #downloadSatImage.downloadSat(bigtile, 14)
+        hightmapTiles.makeSatMap(bigtile)
+        '''
         makeBuildingGeometry.makeBuildings(n)
         src_path = n +'/'+"building_"+n+'.obj'
         destination_path = wpath+'/b_'+newnames[c]+'.obj'
         copyfiles(src_path,destination_path)
+        '''
+
+        src_path = n +'/'+"sentSat_"+n+'.png'
+        destination_path = wpath+'/sat/sat_'+newnames[c]+'.png'
+        copyfiles(src_path,destination_path)
+        
         #
         #src_path = n +'/'+"lakes_"+n+'.obj'
         #destination_path = wpath+'/lakes_/lakes_'+newnames[c]+'.obj'

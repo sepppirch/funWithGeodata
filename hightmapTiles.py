@@ -15,6 +15,41 @@ from PIL import Image, ImageFilter
 #center = (47.48802456352513, 13.233287974359211)
 #DON'T CHANGE THIS!!!
 # https://www.opendem.info/opendemeu_download_4258.html  hightmaps here!!!
+def makeSatMap(bigtile):
+
+    center = (47.48802456352513, 13.233287974359211)
+    h=0.1096
+    w=0.16
+    
+    topLeft = (center[1] + bigtile[1] * w, center[0] - bigtile[0] * h)
+    bottomRight = (topLeft[0]+ w, topLeft[1]- h)
+    name = str(bigtile[0])+"_"+str(bigtile[1])
+    area_box = [(topLeft[0],topLeft[1]), (topLeft[0]+w,topLeft[1]-h)]
+
+    tiff_file = "sentinel/alps_E_c.tif"
+    
+    #tiff_file = "DEM/DEM_NO_austria.tif"
+    #tiff_file = "DEM/alps_4258conv.tif"
+    #tiff_file = "DEM/DEM_nGermoney1.tif"
+    #tiff_file = "Tyrol_5m.tif"
+    #tiff_file = "austria_10m.tif"
+    geo_tiff = GeoTiff(tiff_file, crs_code=4326)#4258 crs_code=4258
+    
+    array = []
+    array = geo_tiff.read_box(area_box)
+    hmap = Image.fromarray(np.uint8(array)) # or more verbose as Image.fromarray(ar32, 'I')
+    newsize = (1024, 1024)
+    hmap = hmap.resize(newsize, Image.Resampling.BICUBIC)
+    #print(hmap.size)
+    #newsize = (2041, 2041)
+    #hmap = hmap.resize(newsize, Image.Resampling.BICUBIC)
+    #newimdata = []
+
+    hmap.save(name +'/sentSat_'+name+'.png')
+    #newim.close()
+
+#makeSatMap((0,0))
+
 def makeHightMap(bigtile):
 
     center = (47.48802456352513, 13.233287974359211)
