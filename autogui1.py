@@ -143,7 +143,7 @@ def findbuttons():
             #dynmatbox = pyautogui.locateOnScreen('dynLandscapeMat.png', confidence=0.9)
             
             #dynmatXY = [dynmatbox.left + landscapebuttne.width + 20, landscapebuttne.top + landscapebuttne.height/2]
-            pyautogui.moveTo([2170,1137], duration = 0.2)
+            pyautogui.moveTo([2215,1180], duration = 0.2)
             pyautogui.click()
 
             '''

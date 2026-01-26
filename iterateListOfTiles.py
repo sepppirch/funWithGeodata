@@ -13,7 +13,7 @@ import downloadSatImage
 #import overpassQuery
 import landuse
 #import masks
-#import segmentSatImage
+import segmentSatImage
 import numpy as np
 import thermalcalculator
 import overpassQuery
@@ -44,8 +44,8 @@ def copyfiles(src_path, destination_path):
 
 
 
-# 'F.geojson'
-with open('tileselectionWW.geojson', 'r') as file:
+# 'F.geojson'tileselection.geojson
+with open('F_quarter.geojson', 'r') as file:
     data = json.load(file)
     for f in data["features"]:
         n = f["properties"]["name"].split("|")
@@ -77,24 +77,28 @@ for n in names:
     bigtile = (int(add[0]),int(add[1]))
     print(n)
     try:
+        #segmentSatImage.segment(n)
         #hightmapTiles.hightmapBurnIn(bigtile)
         #landuse.makeMasksfromLanduse(bigtile)
         #masks.combineNmapCollisionmap(bigtile)
-        #src_path = n +'/'+"nmap_smallc_"+n+'.png'
-        #destination_path = wpath+'/nmap_small_/n_'+newnames[c]+'.png'
-        #copyfiles(src_path,destination_path)
+
         x = 1
         #downloadSatImage.downloadSat(bigtile, 14)
-        hightmapTiles.makeSatMap(bigtile)
-        '''
+        #hightmapTiles.makeSatMap(bigtile)
+        
         makeBuildingGeometry.makeBuildings(n)
+        masks.combineNmapCollisionmap(bigtile)
         src_path = n +'/'+"building_"+n+'.obj'
         destination_path = wpath+'/b_'+newnames[c]+'.obj'
         copyfiles(src_path,destination_path)
-        
 
-        src_path = n +'/'+"sentSat_"+n+'.png'
-        destination_path = wpath+'/sat/sat_'+newnames[c]+'.png'
+        src_path = n +'/'+"nmap_smallc_"+n+'.png'
+        destination_path = wpath+'/nmap_small_/n_'+newnames[c]+'.png'
+        copyfiles(src_path,destination_path)
+        '''
+
+        destination_path = n +'/'+"sentSat_"+n+'.png'
+        src_path  = "sentinel/2x/sentSat_"+n+'.png'
         copyfiles(src_path,destination_path)
         '''
         #

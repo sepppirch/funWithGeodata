@@ -39,15 +39,15 @@ for x in range (18):
             destination_path = wpath +'/hmaps/h'+newname+'.png'
             copy(src_path, destination_path)
 
-            src_path = name +'/forest'+name+'.png'
+            src_path = name +'/forestn'+name+'.png'
             destination_path = wpath+'/forest/f'+newname+'.png'
             copy(src_path, destination_path)
 
-            src_path = name +'/ice'+name+'.png'
+            src_path = name +'/icen'+name+'.png'
             destination_path = wpath+'/ice/i'+newname+'.png'
             copy(src_path, destination_path)
 
-            src_path = name +'/grass'+name+'.png'
+            src_path = name +'/grassn'+name+'.png'
             destination_path = wpath+'/grass/g'+newname+'.png'
             copy(src_path, destination_path)
         '''
