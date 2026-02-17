@@ -709,7 +709,7 @@ def hightmapBurnIn(bigtile):
                                            
     #
 
-    
+    '''
     for x in range(2041*upscale):
         for y in range(2041*upscale):
             if roadsMask[x][y]  < 10:
@@ -718,7 +718,7 @@ def hightmapBurnIn(bigtile):
                 altn[x][y] = altn[x][y] + (float(structure[x%structure.shape[0]][y%structure.shape[0]]) - 120)* 1.1
     #altn = cv2.blur(altn, (2,2))
     #altm = cv2.blur(altm, (3,3))
-
+    '''
 
     roadsMask = cv2.resize(roadsMask, (2041,2041), cv2.INTER_CUBIC)
     cv2.imwrite(name+'/roadsmask'+name+'.png', roadsMask)

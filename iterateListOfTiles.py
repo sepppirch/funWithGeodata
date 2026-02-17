@@ -19,7 +19,7 @@ import thermalcalculator
 import overpassQuery
 import hightmapTiles
 import masks
-#from motionpaths import trafficPaths , pathfromLine
+from motionpaths import trafficPaths , pathfromLine
 
 names = []
 newnames = []
@@ -81,11 +81,11 @@ for n in names:
         #hightmapTiles.hightmapBurnIn(bigtile)
         #landuse.makeMasksfromLanduse(bigtile)
         #masks.combineNmapCollisionmap(bigtile)
-
+        #overpassQuery.downloadGeoJson(bigtile,'way[man_made=snow_fence]',"LineString", 'snowfence')
         x = 1
-        #downloadSatImage.downloadSat(bigtile, 14)
+        #downloadSatImage.makeNormalmap(bigtile, 2041)
         #hightmapTiles.makeSatMap(bigtile)
-        
+        '''
         makeBuildingGeometry.makeBuildings(n)
         masks.combineNmapCollisionmap(bigtile)
         src_path = n +'/'+"building_"+n+'.obj'
@@ -95,7 +95,7 @@ for n in names:
         src_path = n +'/'+"nmap_smallc_"+n+'.png'
         destination_path = wpath+'/nmap_small_/n_'+newnames[c]+'.png'
         copyfiles(src_path,destination_path)
-        '''
+        
 
         destination_path = n +'/'+"sentSat_"+n+'.png'
         src_path  = "sentinel/2x/sentSat_"+n+'.png'
@@ -106,9 +106,14 @@ for n in names:
         #destination_path = wpath+'/lakes_/lakes_'+newnames[c]+'.obj'
         #copyfiles(src_path,destination_path)
         #makeLakes.makeLakesMesh(n)
-        #overpassQuery.cropGeoJsonPoly(bigtile,'alpsGeoJSON/dams_F.geojson','dam')
-        #pathfromLine("dam", n)
+        #overpassQuery.cropGeoJsonPoly(bigtile,'geojson_src/F_snow_fence.geojson','snowfence')
+        #pathfromLine("snowfence", n)
+        
+        src_path = n +'/'+"snowfence_spline_"+n+'.json'
+        destination_path = 'worldmachine_json/snowfence/sf_'+newnames[c]+'.json'
+        copyfiles(src_path,destination_path)
         '''
+        
         
         r1 = ["motorway", "motorway_link"]
         r2 = ["primary","trunk","secondary","tertiary","unclassified"]

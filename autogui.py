@@ -149,8 +149,4 @@ def findbuttons():
 
 
 
-
 findbuttons()
-
-
-#findbuttons("X10_Y11")

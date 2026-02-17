@@ -11,7 +11,7 @@ def add_gaussian_noise(image, mean=0, std=25):
     noisy_image = cv.subtract(image, noise)
     return noisy_image
 
-name = '0_-1'
+name = '0_0'
 #name = '3_-1'
 def segment (name):
     hmap = cv.imread(name + '/hmap'+ name +'.png', cv.IMREAD_UNCHANGED)
@@ -26,9 +26,12 @@ def segment (name):
     #ksize = (5, 5)
     img_hsv = cv.resize(img_hsv, newsize, interpolation = cv.INTER_LINEAR)
     #img_hsv = cv.blur(img_hsv, ksize) 
-  
+    nmap = cv.imread(name + '/nmap_'+ name +'.png')
+    b,g,r = cv.split(nmap)
 # Using cv2.blur() method  
-    
+    steep, steeptr = cv.threshold(r,165,255,cv.THRESH_BINARY)
+    #cv.imshow('steep', steeptr)
+    #cv.waitKey()
 
     roadmask = cv.imread(name + '/rmask'+ name +'.png', cv.IMREAD_UNCHANGED)
     roadmask,trsh = cv.threshold(roadmask,10,255,cv.THRESH_BINARY)
@@ -56,6 +59,7 @@ def segment (name):
     grassimage = cv.subtract(grassimage, roadmask)
     grassimage = cv.subtract(grassimage, lakemask)
     grassimage = cv.subtract(grassimage, icemask)
+    grassimage = cv.subtract(grassimage, cv.bitwise_not(steeptr))
     # rocks
     hsv_color1 = np.asarray([0, 0, 10]) 
     hsv_color2 = np.asarray([30, 70, 255])
@@ -77,15 +81,17 @@ def segment (name):
     forestimage = cv.subtract(forestimage, grassimage)
     forestimage = cv.subtract(forestimage, treeline)
     forestimage = cv.subtract(forestimage, icemask)
+    forestimage = cv.subtract(forestimage, cv.bitwise_not(steeptr))
 
     cv.imwrite(name + '/grassn'+name+'.png', grassimage)
     cv.imwrite(name + '/rocksn'+name+'.png', rocksimage)
     cv.imwrite(name + '/forestn'+ name +'.png', forestimage)
     cv.imwrite(name + '/icen'+ name +'.png', icemask)
+    cv.imwrite(name + '/steep'+ name +'.png', steeptr)
 
 
 
-
+segment(name)
 
 
 

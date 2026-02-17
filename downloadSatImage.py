@@ -54,7 +54,7 @@ def makeNormalmap(bigtile, size):
             
 
             normal[i,j] = (alt[i,j],0,0)
-            xx = 1
+            xx = 2
             A = np.array([0,0, alt[i,j] * 1.5625*xx])
             B = np.array([200,0, alt[i+1,j] * 1.5625*xx])
             C = np.array([0,200, alt[i,j+1] * 1.5625*xx])
@@ -67,9 +67,11 @@ def makeNormalmap(bigtile, size):
             nvec = np.cross(V1, V2)
             l = np.linalg.norm(nvec)
             nvec = nvec/l*90
-            nvec1 = np.add(nvec,[128,128,128])
+            nvec1 = np.add(nvec,[128,128,0])
+            nvec2 = np.multiply(nvec1,[1,1,2.54])
             #print(nvec1)
-            normal[i,j] = nvec1
+            nvec3 = [nvec2[0], nvec2[1], max(0, min(nvec2[2], 255))]
+            normal[i,j] = nvec3
 
     for i in range(w):
         normal[i,h-1] = normal[i,h-2]
@@ -77,7 +79,7 @@ def makeNormalmap(bigtile, size):
         normal[w-1,i] = normal[w-2,i]
 
     
-    cv2.imwrite(name+"/nmap_small_"+name+".png", normal)
+    cv2.imwrite(name+"/nmap_"+name+".png", normal)
 
 
 
@@ -174,7 +176,7 @@ def downloadSat2():
 
 #downloadSat((11,3),13)
     
-#makeNormalmap((0,0),256)
+#makeNormalmap((0,0),2041)
 
 
 
