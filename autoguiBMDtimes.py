@@ -49,7 +49,7 @@ def get_weekdays(year, month):
     return weekdays_list
 
 # Example: Get all weekdays for October 2026
-days = get_weekdays(2026, 9)
+days = get_weekdays(2026, 10)
 # Display results
 
 
